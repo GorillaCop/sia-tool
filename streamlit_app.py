@@ -20,12 +20,6 @@ st.sidebar.error("MARKER: 2026-01-28a")
 st.sidebar.caption(f"Version: {APP_VERSION}")
 st.sidebar.write("RUNNING COMMIT MARKER: LIFELINES_SINGLE_2026-01-28")
 
-
-import streamlit as st
-from datetime import date
-import json
-
-
 # Page configuration
 st.set_page_config(
     page_title="Signal Integrity Assessment™",
