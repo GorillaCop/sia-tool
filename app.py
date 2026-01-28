@@ -93,14 +93,10 @@ def create_message():
         return jsonify({'message': 'Internal Server Error'}), 500
 
 # Health check endpoint
-@app.route('/api/health', methods=['GET'])
+@app.route("/api/health", methods=["GET"])
 def health_check():
-    """Health check endpoint"""
-    return jsonify({
-        'status': 'healthy',
-        'timestamp': datetime.utcnow().isoformat(),
-        'database': 'connected' if db.engine else 'disconnected'
-    })
+    return "OK", 200
+
 
 # Serve React app
 @app.route('/', defaults={'path': ''})
