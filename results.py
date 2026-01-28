@@ -93,6 +93,23 @@ def create_signal_map(analysis):
     values = [status_strength[analysis[lf]['status']] for lf in lifelines]
     colors = [status_colors[analysis[lf]['status']] for lf in lifelines]
     
+    # Prepare hover text with detailed information
+    hover_texts = []
+    for lf in lifelines:
+        data = analysis[lf]
+        signals = data['signals']
+        hover_text = (
+            f"<b>{lf}</b><br>"
+            f"Status: <b>{data['status']}</b><br>"
+            f"<br>Signal Breakdown:<br>"
+            f"• Observed: {signals.get('Observed', 0)}<br>"
+            f"• Assumed: {signals.get('Assumed', 0)}<br>"
+            f"• Historical: {signals.get('Historical', 0)}<br>"
+            f"• Compensated: {signals.get('Compensated', 0)}<br>"
+            f"<br>{data['description']}"
+        )
+        hover_texts.append(hover_text)
+    
     # Create radar chart
     fig = go.Figure()
     
@@ -108,7 +125,8 @@ def create_signal_map(analysis):
             line=dict(color='white', width=2)
         ),
         name='Signal Strength',
-        hovertemplate='<b>%{theta}</b><br>Status: %{r}<extra></extra>'
+        text=hover_texts,
+        hovertemplate='%{text}<extra></extra>'
     ))
     
     fig.update_layout(
@@ -135,7 +153,9 @@ def create_signal_map(analysis):
         height=500,
         margin=dict(l=80, r=80, t=80, b=80),
         paper_bgcolor='white',
-        plot_bgcolor='white'
+        plot_bgcolor='white',
+        hovermode='closest',
+        dragmode='pan'
     )
     
     return fig
@@ -195,10 +215,22 @@ def create_network_signal_map(analysis):
         hoverinfo='skip'
     ))
     
-    # Add lifeline nodes
+    # Add lifeline nodes with enhanced hover
     for i, lifeline in enumerate(lifelines, 1):
         status = analysis[lifeline]['status']
         style = status_styles[status]
+        signals = analysis[lifeline]['signals']
+        
+        # Create detailed hover text
+        hover_text = (
+            f"<b>{lifeline}</b><br>"
+            f"Status: {status}<br>"
+            f"<br>Signals:<br>"
+            f"Observed: {signals.get('Observed', 0)}<br>"
+            f"Assumed: {signals.get('Assumed', 0)}<br>"
+            f"Historical: {signals.get('Historical', 0)}<br>"
+            f"Compensated: {signals.get('Compensated', 0)}"
+        )
         
         fig.add_trace(go.Scatter(
             x=[node_x[i]],
@@ -213,7 +245,8 @@ def create_network_signal_map(analysis):
             textposition='top center',
             textfont=dict(size=9),
             showlegend=False,
-            hovertemplate=f'<b>{lifeline}</b><br>Status: {status}<extra></extra>'
+            hovertext=hover_text,
+            hoverinfo='text'
         ))
     
     # Update layout
@@ -341,6 +374,27 @@ def show_results_page():
     For shared organizational clarity, this assessment is often reviewed in a facilitated mirror session.
     """)
     
+    # Professional CTA Footer
+    st.markdown('---')
+    st.markdown("""
+    <div style='text-align: center; padding: 2rem; background-color: #f8fafc; border-radius: 8px; margin-top: 2rem;'>
+        <h3 style='color: #1e293b; margin-bottom: 1rem;'>Schedule a Mirror Session</h3>
+        <p style='color: #64748b; margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;'>
+            Gain shared organizational clarity by reviewing this assessment in a facilitated discussion 
+            with your leadership team.
+        </p>
+        <a href='mailto:contact@southwindplanning.com?subject=Mirror Session Request&body=I just completed the Signal Integrity Assessment and would like to schedule a mirror session.%0D%0A%0D%0AOrganization: {org_name}%0D%0AAssessment Date: {date}' 
+           style='display: inline-block; background-color: #1e293b; color: white; padding: 0.875rem 2rem; 
+                  text-decoration: none; border-radius: 6px; font-weight: 500; 
+                  transition: background-color 0.2s;'>
+            Schedule Mirror Session →
+        </a>
+        <p style='color: #94a3b8; font-size: 0.875rem; margin-top: 1.5rem;'>
+            <strong>Southwind Planning</strong> • Readiness Is Not a Plan. It's a Capability.
+        </p>
+    </div>
+    """.format(org_name=st.session_state.org_name, date=st.session_state.assessment_date), unsafe_allow_html=True)
+    
     # Export options
     st.markdown('---')
     st.header('Export Options')
@@ -351,27 +405,27 @@ def show_results_page():
         if st.button('📄 Download PDF Report', use_container_width=True):
             st.info('PDF generation coming soon!')
     
- with col2:
-    # Export data as JSON
-    export_data = {
-        'organization': st.session_state.org_name,
-        'assessment_date': str(st.session_state.assessment_date),
-        'analysis': {k: {
-            'status': v['status'],
-            'description': v['description'],
-            'signals': dict(v['signals'])
-        } for k, v in analysis.items()}
-    }
+    with col2:
+        # Export data as JSON
+        export_data = {
+            'organization': st.session_state.org_name,
+            'assessment_date': str(st.session_state.assessment_date),
+            'analysis': {k: {
+                'status': v['status'],
+                'description': v['description'],
+                'signals': dict(v['signals'])
+            } for k, v in analysis.items()}
+        }
 
-    safe_org = st.session_state.org_name.replace(" ", "_")
+        safe_org = st.session_state.org_name.replace(" ", "_")
 
-    st.download_button(
-        label='💾 Download Data (JSON)',
-        data=json.dumps(export_data, indent=2),
-        file_name=f'signal_integrity_{safe_org}_{st.session_state.assessment_date}.json',
-        mime='application/json',
-        use_container_width=True
-    )
+        st.download_button(
+            label='💾 Download Data (JSON)',
+            data=json.dumps(export_data, indent=2),
+            file_name=f'signal_integrity_{safe_org}_{st.session_state.assessment_date}.json',
+            mime='application/json',
+            use_container_width=True
+        )
 
     
     # Restart option
@@ -381,3 +435,4 @@ def show_results_page():
         for key in list(st.session_state.keys()):
             del st.session_state[key]
         st.rerun()
+
