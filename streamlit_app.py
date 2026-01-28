@@ -112,7 +112,7 @@ LIFELINES = {
     2: {
         'name': 'Decision Clarity',
         'questions': [
-            'When urgent decisions are needed, how do you verify you're working from current information?',
+            'When urgent decisions are needed, how do you verify you\'re working from current information?',
             'What decisions are currently being delayed due to incomplete information or competing priorities?',
             'Where do informal channels override formal decision-making processes?',
             'How do you know when a decision is based on accurate versus assumed information?',
