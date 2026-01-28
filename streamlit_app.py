@@ -16,8 +16,37 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# ✅ GLOBAL TAGLINE (safe, top-level, not inside any function)
+st.markdown(
+    "<p class='tagline'>Readiness Is Not a Plan. It's a Capability.</p>",
+    unsafe_allow_html=True
+)
+
+# Optional debug/version markers (temporary)
 st.sidebar.caption(f"Version: {APP_VERSION}")
 st.sidebar.error("MARKER: 2026-01-28b")
+
+# Custom CSS for professional styling
+st.markdown("""
+<style>
+    .main {
+        padding: 2rem;
+    }
+    h1 {
+        font-weight: 300;
+        letter-spacing: 2px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .tagline {
+        font-style: italic;
+        color: #475569;
+        margin-bottom: 1.5rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 
 # Custom CSS for professional styling
 st.markdown("""
