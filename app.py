@@ -17,7 +17,7 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 # Create Flask app
-app = Flask(__name__, static_folder='dist', static_url_path='')
+app = Flask(__name__)
 
 # Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
@@ -99,24 +99,14 @@ def health_check():
 
 
 # Serve React app
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    """Serve React app for all non-API routes"""
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, 'index.html')
+@app.route("/", methods=["GET"])
+def home():
+    return "Signal Integrity Assessment API is running.", 200
 
 # Error handlers
 @app.errorhandler(404)
 def not_found(e):
-    """Handle 404 errors"""
-    # If it's an API request, return JSON
-    if request.path.startswith('/api/'):
-        return jsonify({'message': 'Not found'}), 404
-    # Otherwise serve the React app (for client-side routing)
-    return send_from_directory(app.static_folder, 'index.html')
+    return jsonify({'message': 'Not found'}), 404
 
 @app.errorhandler(500)
 def internal_error(e):
