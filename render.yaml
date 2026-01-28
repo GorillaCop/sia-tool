@@ -5,7 +5,8 @@ services:
     runtime: python
     plan: free  # Change to 'starter' for always-on ($7/month)
     region: oregon  # Options: oregon, frankfurt, singapore, ohio
-    buildCommand: pip install -r requirements.txt && python3 build.py
+    buildCommand: pip install -r requirements.txt
+
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60
     envVars:
       - key: PYTHON_VERSION
