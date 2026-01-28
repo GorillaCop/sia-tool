@@ -1,3 +1,5 @@
+st.write("RUNNING COMMIT MARKER: LIFELINES_SINGLE_2026-01-28")
+
 """
 Signal Integrity Assessment™
 Streamlit Application - Main Entry Point
