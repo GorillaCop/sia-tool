@@ -373,16 +373,6 @@ def show_results_page():
         use_container_width=True
     )
 
-
-st.download_button(
-    label='💾 Download Data (JSON)',
-    data=json.dumps(export_data, indent=2),
-    file_name=f'signal_integrity_{safe_org}_{st.session_state.assessment_date}.json',
-    mime='application/json',
-    use_container_width=True
-)
-
-
     
     # Restart option
     st.markdown('---')
