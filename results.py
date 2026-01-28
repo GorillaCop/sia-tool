@@ -363,13 +363,16 @@ def show_results_page():
             } for k, v in analysis.items()}
         }
         
-       st.download_button(
+     safe_org = st.session_state.org_name.replace(" ", "_")
+
+st.download_button(
     label='💾 Download Data (JSON)',
     data=json.dumps(export_data, indent=2),
-    file_name=f'signal_integrity_{st.session_state.org_name}_{st.session_state.assessment_date}.json',
+    file_name=f'signal_integrity_{safe_org}_{st.session_state.assessment_date}.json',
     mime='application/json',
     use_container_width=True
 )
+
 
     
     # Restart option
