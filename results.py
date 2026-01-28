@@ -351,19 +351,28 @@ def show_results_page():
         if st.button('📄 Download PDF Report', use_container_width=True):
             st.info('PDF generation coming soon!')
     
-    with col2:
-        # Export data as JSON
-        export_data = {
-            'organization': st.session_state.org_name,
-            'assessment_date': str(st.session_state.assessment_date),
-            'analysis': {k: {
-                'status': v['status'],
-                'description': v['description'],
-                'signals': dict(v['signals'])
-            } for k, v in analysis.items()}
-        }
-        
-     safe_org = st.session_state.org_name.replace(" ", "_")
+ with col2:
+    # Export data as JSON
+    export_data = {
+        'organization': st.session_state.org_name,
+        'assessment_date': str(st.session_state.assessment_date),
+        'analysis': {k: {
+            'status': v['status'],
+            'description': v['description'],
+            'signals': dict(v['signals'])
+        } for k, v in analysis.items()}
+    }
+
+    safe_org = st.session_state.org_name.replace(" ", "_")
+
+    st.download_button(
+        label='💾 Download Data (JSON)',
+        data=json.dumps(export_data, indent=2),
+        file_name=f'signal_integrity_{safe_org}_{st.session_state.assessment_date}.json',
+        mime='application/json',
+        use_container_width=True
+    )
+
 
 st.download_button(
     label='💾 Download Data (JSON)',
