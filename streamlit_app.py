@@ -1,383 +1,306 @@
 """
 Signal Integrity Assessment™
-Results Page with Signal Map Visualization
+Streamlit Application - Main Entry Point
 """
 
 import streamlit as st
-import plotly.graph_objects as go
-from collections import Counter
+from datetime import date
 import json
 
+APP_VERSION = "2026-01-28b"
 
-def analyze_responses():
-    """Analyze responses and generate insights"""
-    lifeline_analysis = {}
-    
-    # Define lifeline names
-    lifelines = {
-        0: 'Leadership Awareness',
-        1: 'Operational Dependencies',
-        2: 'Decision Clarity',
-        3: 'Resource Resilience',
-        4: 'Information Flow'
+st.set_page_config(
+    page_title="Signal Integrity Assessment™",
+    page_icon="🎯",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+st.sidebar.caption(f"Version: {APP_VERSION}")
+st.sidebar.error("MARKER: 2026-01-28b")
+
+# Custom CSS for professional styling
+st.markdown("""
+<style>
+    .main {
+        padding: 2rem;
     }
-    
-    for lifeline_idx, lifeline_name in lifelines.items():
-        signals = []
-        
-        # Count each signal type for this lifeline
-        for q_idx in range(5):  # 5 questions per lifeline
-            key = f'{lifeline_idx}_{q_idx}_signal'
-            if key in st.session_state.responses:
-                signal = st.session_state.responses[key].split(' - ')[0]  # Get just "Observed", etc.
-                signals.append(signal)
-        
-        if signals:
-            signal_counts = Counter(signals)
-            total = len(signals)
-            
-            # Calculate percentages
-            observed_pct = (signal_counts.get('Observed', 0) / total) * 100
-            compensated_pct = (signal_counts.get('Compensated', 0) / total) * 100
-            fragile_pct = ((signal_counts.get('Assumed', 0) + signal_counts.get('Historical', 0)) / total) * 100
-            
-            # Determine status
-            if observed_pct >= 60:
-                status = 'SOLID'
-                description = 'Largely supported by observed signals with current evidence.'
-            elif compensated_pct >= 40:
-                status = 'FRAGILE'
-                description = 'Stability depends on individual effort and informal fixes.'
-            elif fragile_pct >= 60:
-                status = 'CONDITIONAL'
-                description = 'Confidence appears to rest on belief or outdated verification.'
-            else:
-                status = 'MIXED'
-                description = 'Shows varied signal patterns requiring attention.'
-            
-            lifeline_analysis[lifeline_name] = {
-                'signals': signal_counts,
-                'status': status,
-                'description': description,
-                'observed_pct': observed_pct,
-                'compensated_pct': compensated_pct,
-                'fragile_pct': fragile_pct
-            }
-    
-    return lifeline_analysis
-
-
-def create_signal_map(analysis):
-    """Create Plotly signal map visualization"""
-    
-    # Prepare data for radial chart
-    lifelines = list(analysis.keys())
-    
-    # Map status to numeric strength (for visualization)
-    status_strength = {
-        'SOLID': 100,
-        'CONDITIONAL': 60,
-        'MIXED': 40,
-        'FRAGILE': 20
+    h1 {
+        font-weight: 300;
+        letter-spacing: 2px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
     }
-    
-    # Map status to colors
-    status_colors = {
-        'SOLID': '#10b981',      # Green
-        'CONDITIONAL': '#f59e0b', # Amber
-        'MIXED': '#6b7280',       # Gray
-        'FRAGILE': '#ef4444'      # Red
+    h2 {
+        font-weight: 600;
+        margin-top: 30px;
+        margin-bottom: 10px;
     }
-    
-    # Get values and colors for each lifeline
-    values = [status_strength[analysis[lf]['status']] for lf in lifelines]
-    colors = [status_colors[analysis[lf]['status']] for lf in lifelines]
-    
-    # Create radar chart
-    fig = go.Figure()
-    
-    fig.add_trace(go.Scatterpolar(
-        r=values,
-        theta=lifelines,
-        fill='toself',
-        fillcolor='rgba(99, 102, 241, 0.2)',
-        line=dict(color='rgb(99, 102, 241)', width=2),
-        marker=dict(
-            size=12,
-            color=colors,
-            line=dict(color='white', width=2)
-        ),
-        name='Signal Strength',
-        hovertemplate='<b>%{theta}</b><br>Status: %{r}<extra></extra>'
-    ))
-    
-    fig.update_layout(
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, 100],
-                showticklabels=False,
-                ticks='',
-                showline=False
-            ),
-            angularaxis=dict(
-                direction='clockwise',
-                rotation=90
-            )
-        ),
-        showlegend=False,
-        title={
-            'text': 'Signal Integrity Map',
-            'x': 0.5,
-            'xanchor': 'center',
-            'font': {'size': 20, 'family': 'Arial, sans-serif'}
-        },
-        height=500,
-        margin=dict(l=80, r=80, t=80, b=80),
-        paper_bgcolor='white',
-        plot_bgcolor='white'
-    )
-    
-    return fig
-
-
-def create_network_signal_map(analysis):
-    """Create network-style signal map (alternative visualization)"""
-    import numpy as np
-    
-    # Central node at origin
-    center_x, center_y = 0, 0
-    
-    # Calculate positions for lifeline nodes in a circle
-    lifelines = list(analysis.keys())
-    n = len(lifelines)
-    angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
-    radius = 2
-    
-    node_x = [center_x] + [radius * np.cos(angle) for angle in angles]
-    node_y = [center_y] + [radius * np.sin(angle) for angle in angles]
-    
-    # Map status to line styles
-    status_styles = {
-        'SOLID': dict(width=4, dash='solid', color='#10b981'),
-        'CONDITIONAL': dict(width=3, dash='dot', color='#f59e0b'),
-        'MIXED': dict(width=2, dash='dash', color='#6b7280'),
-        'FRAGILE': dict(width=2, dash='dash', color='#ef4444')
+    .tagline {
+        font-size: 1.1rem;
+        color: #1e293b;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-style: italic;
     }
-    
-    # Create figure
-    fig = go.Figure()
-    
-    # Add edges (lines from center to each lifeline)
-    for i, lifeline in enumerate(lifelines, 1):
-        status = analysis[lifeline]['status']
-        style = status_styles[status]
-        
-        fig.add_trace(go.Scatter(
-            x=[center_x, node_x[i]],
-            y=[center_y, node_y[i]],
-            mode='lines',
-            line=style,
-            showlegend=False,
-            hoverinfo='skip'
-        ))
-    
-    # Add central node
-    fig.add_trace(go.Scatter(
-        x=[center_x],
-        y=[center_y],
-        mode='markers+text',
-        marker=dict(size=30, color='#1e293b', line=dict(width=2, color='white')),
-        text=['Leadership<br>Confidence'],
-        textposition='middle center',
-        textfont=dict(color='white', size=10),
-        showlegend=False,
-        hoverinfo='skip'
-    ))
-    
-    # Add lifeline nodes
-    for i, lifeline in enumerate(lifelines, 1):
-        status = analysis[lifeline]['status']
-        style = status_styles[status]
-        
-        fig.add_trace(go.Scatter(
-            x=[node_x[i]],
-            y=[node_y[i]],
-            mode='markers+text',
-            marker=dict(
-                size=25,
-                color=style['color'],
-                line=dict(width=2, color='white')
-            ),
-            text=[lifeline.replace(' ', '<br>')],
-            textposition='top center',
-            textfont=dict(size=9),
-            showlegend=False,
-            hovertemplate=f'<b>{lifeline}</b><br>Status: {status}<extra></extra>'
-        ))
-    
-    # Update layout
-    fig.update_layout(
-        title={
-            'text': 'Signal Network Map',
-            'x': 0.5,
-            'xanchor': 'center',
-            'font': {'size': 20}
-        },
-        xaxis=dict(visible=False, range=[-3, 3]),
-        yaxis=dict(visible=False, range=[-3, 3]),
-        height=600,
-        showlegend=False,
-        hovermode='closest',
-        paper_bgcolor='white',
-        plot_bgcolor='white',
-        margin=dict(l=20, r=20, t=60, b=20)
-    )
-    
-    return fig
-
-
-def show_results_page():
-    """Display results with visualizations"""
-    st.title('Signal Integrity Assessment™')
-    st.markdown(f"**{st.session_state.org_name}** • Assessment Date: {st.session_state.assessment_date}")
-    
-    st.markdown('---')
-    
-    # Analyze responses
-    analysis = analyze_responses()
-    
-    # Section 1: Executive Observations
-    st.header('Executive Observations')
-    
-    for lifeline_name, data in analysis.items():
-        status_color = {
-            'SOLID': '🟢',
-            'CONDITIONAL': '🟡',
-            'MIXED': '⚪',
-            'FRAGILE': '🔴'
+    .stButton > button {
+        background-color: #1e293b;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+    }
+    .stButton > button:hover {
+        background-color: #334155;
+    }
+    .lifeline-header {
+        background-color: #f8fafc;
+        padding: 1rem;
+        border-left: 4px solid #64748b;
+        margin-bottom: 1rem;
+    }
+    .question-container {
+        background-color: #ffffff;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+        border-radius: 4px;
+        animation: fadeIn 0.3s ease-in;
+    }
+    .progress-text {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
         }
-        
-        st.markdown(f"""
-        **{status_color[data['status']]} {lifeline_name}**  
-        *Status: {data['status']}*  
-        {data['description']}
-        """)
-        st.markdown('---')
-    
-    # Section 2: Signal Map Visualization
-    st.header('Signal Integrity Map')
-    
-    st.markdown("""
-    This visualization shows the relative strength of each business lifeline. 
-    Node colors indicate status, and the distance from center represents signal integrity.
-    """)
-    
-    # Choose visualization style
-    viz_type = st.radio(
-        'Visualization Style',
-        ['Radar Chart', 'Network Map'],
-        horizontal=True
-    )
-    
-    if viz_type == 'Radar Chart':
-        fig = create_signal_map(analysis)
-    else:
-        fig = create_network_signal_map(analysis)
-    
-    st.plotly_chart(fig, use_container_width=True)
-    
-    # Section 3: Lifeline Integrity Grid
-    st.header('Lifeline Integrity Grid')
-    
-    # Create table data
-    table_data = []
-    for lifeline_name, data in analysis.items():
-        signals = data['signals']
-        signal_pattern = ', '.join([f"{sig}: {count}" for sig, count in signals.items()])
-        table_data.append({
-            'Lifeline': lifeline_name,
-            'Status': data['status'],
-            'Signal Pattern': signal_pattern
-        })
-    
-    st.table(table_data)
-    
-    # Section 4: Key Distinctions
-    st.header('Key Distinctions')
-    
-    st.markdown("""
-    **Signal Classifications Defined:**
-    
-    - **Observed:** Direct, current evidence. Leaders can point to specific, recent verification.
-    
-    - **Assumed:** Believed to be true but not recently confirmed. Often legacy knowledge.
-    
-    - **Historical:** Once verified but not tested under current conditions. May no longer hold.
-    
-    - **Compensated:** Stability depends on individual effort, workarounds, or heroics rather than documented process.
-    """)
-    
-    # Section 5: Reflection Prompts
-    st.header('Questions for Leadership Reflection')
-    
-    st.markdown("""
-    - Which of these lifelines would matter most under sustained pressure or resource constraint?
-    
-    - Where is operational continuity currently dependent on specific individuals rather than documented process?
-    
-    - What information would you want independently verified before your next major decision?
-    
-    - Where might historical assumptions be vulnerable to current market or operational changes?
-    """)
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    a[href*="mailto"]:hover {
+        background-color: #334155 !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Initialize session state
+if 'page' not in st.session_state:
+    st.session_state.page = 'metadata'
+if 'responses' not in st.session_state:
+    st.session_state.responses = {}
+if 'current_lifeline' not in st.session_state:
+    st.session_state.current_lifeline = 0
+
+# Assessment questions structure
+LIFELINES = {
+    0: {
+        'name': 'Leadership Awareness',
+        'questions': [
+            'How do you currently know what is working and what is under strain across critical operations?',
+            'When priorities compete, how do you know which dependencies will fail first?',
+            'What would become visible only under sustained pressure or resource constraints?',
+            'How do leaders verify that operational assumptions are still valid?',
+            'What information do you rely on that has not been independently confirmed in the past 6 months?'
+        ]
+    },
+    1: {
+        'name': 'Operational Dependencies',
+        'questions': [
+            'What critical processes depend on specific individuals to function properly?',
+            'Which vendor or supplier relationships have not been stress-tested in the past 12 months?',
+            'What workarounds have become standard operating procedure?',
+            'What happens if your top three operational experts are unavailable for two weeks?',
+            'Which systems or processes lack documented backup procedures?'
+        ]
+    },
+    2: {
+        'name': 'Decision Clarity',
+        'questions': [
+            'When urgent decisions are needed, how do you verify you\'re working from current information?',
+            'What decisions are currently being delayed due to incomplete information or competing priorities?',
+            'Where do informal channels override formal decision-making processes?',
+            'How do you know when a decision is based on accurate versus assumed information?',
+            'What percentage of major decisions are made with verified data versus historical assumptions?'
+        ]
+    },
+    3: {
+        'name': 'Resource Resilience',
+        'questions': [
+            'Which resources (people, systems, suppliers) operate with no viable backup or alternative?',
+            'What capabilities exist primarily because of individual expertise rather than documented process?',
+            'Where is organizational capacity being sustained through overtime, heroics, or goodwill?',
+            'What critical resources are operating at or above sustainable capacity?',
+            'Which resource constraints are currently being managed through workarounds?'
+        ]
+    },
+    4: {
+        'name': 'Information Flow',
+        'questions': [
+            'How do you know when critical information is not reaching decision-makers?',
+            'What signals of emerging problems currently go unnoticed or unreported?',
+            'Where does "everything is fine" actually mean "someone is handling it quietly"?',
+            'How is bad news communicated upward in your organization?',
+            'What information do you wish you had real-time visibility into?'
+        ]
+    }
+}
+
+SIGNAL_TYPES = [
+    'Observed - Direct, current evidence',
+    'Assumed - Believed but not verified',
+    'Historical - Once true, not recently tested',
+    'Compensated - Held together by people/workarounds'
+]
+
+
+def show_metadata_page():
+    """Metadata collection page"""
+    st.title('Signal Integrity Assessment™')
+    st.markdown('<p class="tagline">Readiness Is Not a Plan. It's a Capability.</p>', unsafe_allow_html=True)
+    st.markdown('*A structured executive diagnostic that reveals where leadership decisions are supported by verified information—and where they depend on assumptions, workarounds, or individual effort.*')
     
     st.markdown('---')
-    
-    # Closing Statement
-    st.info("""
-    **Note:** This assessment identifies where decision confidence is well supported by current evidence 
-    and where additional verification may be needed. It does not prescribe solutions or evaluate leadership capability.
-    
-    For shared organizational clarity, this assessment is often reviewed in a facilitated mirror session.
-    """)
-    
-    # Export options
-    st.markdown('---')
-    st.header('Export Options')
     
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button('📄 Download PDF Report', use_container_width=True):
-            st.info('PDF generation coming soon!')
+        org_name = st.text_input(
+            'Organization Name',
+            value=st.session_state.get('org_name', ''),
+            help='Enter your organization or company name'
+        )
     
- with col2:
-    # Export data as JSON
-    export_data = {
-        'organization': st.session_state.org_name,
-        'assessment_date': str(st.session_state.assessment_date),
-        'analysis': {k: {
-            'status': v['status'],
-            'description': v['description'],
-            'signals': dict(v['signals'])
-        } for k, v in analysis.items()}
-    }
-
-    safe_org = st.session_state.org_name.replace(" ", "_")
-
-    st.download_button(
-        label='💾 Download Data (JSON)',
-        data=json.dumps(export_data, indent=2),
-        file_name=f'signal_integrity_{safe_org}_{st.session_state.assessment_date}.json',
-        mime='application/json',
-        use_container_width=True
-    )
-
+    with col2:
+        assessment_date = st.date_input(
+            'Assessment Date',
+            value=st.session_state.get('assessment_date', date.today())
+        )
     
-    # Restart option
     st.markdown('---')
-    if st.button('← Start New Assessment', use_container_width=False):
-        # Clear session state
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.rerun()
+    
+    st.markdown("""
+    ### What to Expect
+    
+    This assessment examines 5 critical business lifelines:
+    - **Leadership Awareness** - Quality of operational visibility
+    - **Operational Dependencies** - Key process and resource dependencies
+    - **Decision Clarity** - Information quality for decisions
+    - **Resource Resilience** - Backup capacity and sustainability
+    - **Information Flow** - Communication and signal detection
+    
+    **Time required:** Approximately 15 minutes
+    
+    **Output:** A single-page executive artifact showing where your decisions rest on verified information versus assumptions.
+    """)
+    
+    st.markdown('---')
+    
+    if st.button('Begin Assessment', use_container_width=True):
+        if org_name.strip():
+            st.session_state.org_name = org_name
+            st.session_state.assessment_date = assessment_date
+            st.session_state.page = 'assessment'
+            st.session_state.current_lifeline = 0
+            st.rerun()
+        else:
+            st.error('Please enter an organization name to continue.')
+
+
+def show_assessment_page():
+    """Main assessment page with questions"""
+    lifeline_idx = st.session_state.current_lifeline
+    lifeline = LIFELINES[lifeline_idx]
+    
+    # Header
+    st.title('Signal Integrity Assessment™')
+    st.markdown(f"**{st.session_state.org_name}** • {st.session_state.assessment_date}")
+    
+    # Progress indicator
+    progress = (lifeline_idx + 1) / len(LIFELINES)
+    st.progress(progress)
+    st.markdown(f'<p class="progress-text">Business Lifeline {lifeline_idx + 1} of {len(LIFELINES)} • {int(progress * 100)}% Complete</p>', unsafe_allow_html=True)
+    
+    st.markdown('---')
+    
+    # Lifeline header
+    st.markdown(f'<div class="lifeline-header"><h2>🎯 {lifeline["name"]}</h2></div>', unsafe_allow_html=True)
+    
+    # Questions
+    for q_idx, question in enumerate(lifeline['questions']):
+        key_base = f'{lifeline_idx}_{q_idx}'
+        
+        st.markdown(f'<div class="question-container">', unsafe_allow_html=True)
+        st.markdown(f'**Question {q_idx + 1} of {len(lifeline["questions"])}**')
+        st.markdown(f'*{question}*')
+        
+        # Response text area
+        response = st.text_area(
+            'Your Response',
+            value=st.session_state.responses.get(f'{key_base}_response', ''),
+            key=f'{key_base}_response_input',
+            height=100,
+            help='Provide a specific, operational response'
+        )
+        
+        # Signal classification
+        signal_type = st.selectbox(
+            'Signal Classification',
+            options=SIGNAL_TYPES,
+            index=SIGNAL_TYPES.index(st.session_state.responses.get(f'{key_base}_signal', SIGNAL_TYPES[0])) if f'{key_base}_signal' in st.session_state.responses else 0,
+            key=f'{key_base}_signal_input',
+            help='How would you classify the quality of information behind this response?'
+        )
+        
+        # Save to session state
+        st.session_state.responses[f'{key_base}_response'] = response
+        st.session_state.responses[f'{key_base}_signal'] = signal_type
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('---')
+    
+    # Navigation buttons
+    col1, col2, col3 = st.columns([1, 1, 1])
+    
+    with col1:
+        if lifeline_idx > 0:
+            if st.button('← Previous Lifeline', use_container_width=True):
+                st.session_state.current_lifeline -= 1
+                st.rerun()
+    
+    with col2:
+        if st.button('Save Progress', use_container_width=True):
+            st.success('Progress saved!')
+    
+    with col3:
+        if lifeline_idx < len(LIFELINES) - 1:
+            if st.button('Next Lifeline →', use_container_width=True):
+                st.session_state.current_lifeline += 1
+                st.rerun()
+        else:
+            if st.button('Generate Assessment →', use_container_width=True, type='primary'):
+                st.session_state.page = 'results'
+                st.rerun()
+
+
+def main():
+    """Main application router"""
+    if st.session_state.page == 'metadata':
+        show_metadata_page()
+    elif st.session_state.page == 'assessment':
+        show_assessment_page()
+    elif st.session_state.page == 'results':
+        # Import and show results page
+        from results import show_results_page
+        show_results_page()
+
+
+if __name__ == '__main__':
+    main()
+
