@@ -162,10 +162,7 @@ SIGNAL_TYPES = [
 def show_metadata_page():
     """Metadata collection page"""
     st.title('Signal Integrity Assessment™')
-    st.markdown(
-    "<p class='tagline'>Readiness Is Not a Plan. It's a Capability.</p>",
-    unsafe_allow_html=True
-)
+st.markdown("<p class='tagline'>Readiness Is Not a Plan. It's a Capability.</p>", unsafe_allow_html=True)
 
     st.markdown('*A structured executive diagnostic that reveals where leadership decisions are supported by verified information—and where they depend on assumptions, workarounds, or individual effort.*')
     
