@@ -1,0 +1,30 @@
+services:
+  # Web Service - Flask + React App
+  - type: web
+    name: signal-integrity-assessment
+    runtime: python
+    plan: free  # Change to 'starter' for always-on ($7/month)
+    region: oregon  # Options: oregon, frankfurt, singapore, ohio
+    buildCommand: pip install -r requirements.txt && python3 build.py
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: signal-integrity-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+databases:
+  # PostgreSQL Database
+  - name: signal-integrity-db
+    plan: free  # Change to 'starter' for better performance ($7/month)
+    databaseName: signal_integrity
+    user: signal_user
+    region: oregon  # Should match web service region
