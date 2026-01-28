@@ -6,8 +6,7 @@ Streamlit Application - Main Entry Point
 import streamlit as st
 from datetime import date
 import json
-APP_VERSION = "2026-01-28a"
-st.sidebar.caption(f"Version: {APP_VERSION}")
+
 
 # Page configuration
 st.set_page_config(
@@ -16,7 +15,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-
+APP_VERSION = "2026-01-28a"
+st.sidebar.caption(f"Version: {APP_VERSION}")
 # Custom CSS for professional styling
 st.markdown("""
 <style>
