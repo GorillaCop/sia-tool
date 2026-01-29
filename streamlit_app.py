@@ -342,62 +342,6 @@ def show_assessment_page():
 
     # (then your existing rendering code continues here...)
 
-    """Main assessment page with questions"""
-    lifeline_idx = st.session_state.current_lifeline
-    lifeline = LIFELINES[lifeline_idx]
-    # ✅ Force scroll-to-top AFTER rerun (on new render)
-if st.session_state.get("force_scroll_top", False):
-    scroll_to_top()
-    st.session_state.force_scroll_top = False
-
-    # Header
-    st.title('Signal Integrity Assessment™')
-    st.markdown(f"**{st.session_state.org_name}** • {st.session_state.assessment_date}")
-    
-    # Progress indicator
-    progress = (lifeline_idx + 1) / len(LIFELINES)
-    st.progress(progress)
-    st.markdown(f'<p class="progress-text">Business Lifeline {lifeline_idx + 1} of {len(LIFELINES)} • {int(progress * 100)}% Complete</p>', unsafe_allow_html=True)
-    
-    st.markdown('---')
-    
-    # Lifeline header
-    st.markdown(f'<div class="lifeline-header"><h2>🎯 {lifeline["name"]}</h2></div>', unsafe_allow_html=True)
-    
-    # Questions
-    for q_idx, question in enumerate(lifeline['questions']):
-        key_base = f'{lifeline_idx}_{q_idx}'
-        
-        st.markdown(f'<div class="question-container">', unsafe_allow_html=True)
-        st.markdown(f'**Question {q_idx + 1} of {len(lifeline["questions"])}**')
-        st.markdown(f'*{question}*')
-        
-        # Response text area
-        response = st.text_area(
-            'Your Response',
-            value=st.session_state.responses.get(f'{key_base}_response', ''),
-            key=f'{key_base}_response_input',
-            height=100,
-            help='Provide a specific, operational response'
-        )
-        
-        # Signal classification
-        signal_type = st.selectbox(
-            'Signal Classification',
-            options=SIGNAL_TYPES,
-            index=SIGNAL_TYPES.index(st.session_state.responses.get(f'{key_base}_signal', SIGNAL_TYPES[0])) if f'{key_base}_signal' in st.session_state.responses else 0,
-            key=f'{key_base}_signal_input',
-            help='How would you classify the quality of information behind this response?'
-        )
-        
-        # Save to session state
-        st.session_state.responses[f'{key_base}_response'] = response
-        st.session_state.responses[f'{key_base}_signal'] = signal_type
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('---')
-    
     # Navigation buttons
     col1, col2, col3 = st.columns([1, 1, 1])
 
