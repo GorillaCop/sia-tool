@@ -2,7 +2,7 @@
 Signal Integrity Assessment™
 Streamlit Application - Main Entry Point
 """
-
+import streamlit.components.v1 as components
 import streamlit as st
 from datetime import date
 import json
