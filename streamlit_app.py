@@ -312,7 +312,7 @@ def scroll_to_top():
 def show_assessment_page():
     st.write("DEBUG: assessment page loaded")
     try:
-    st.write("Main assessment page with questions")
+        st.write("Main assessment page with questions")
 
     # --- EVERYTHING ELSE in this function goes below here ---
     lifeline_idx = st.session_state.get("current_lifeline", 0)
