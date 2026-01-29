@@ -296,6 +296,18 @@ def show_metadata_page():
         else:
             st.error('Please enter an organization name to continue.')
 
+def scroll_to_top():
+    components.html(
+        """
+        <script>
+        const main = window.parent.document.querySelector('section.main');
+        if (main) { main.scrollTo(0, 0); }
+        window.parent.scrollTo(0, 0);
+        window.scrollTo(0, 0);
+        </script>
+        """,
+        height=0,
+    )
 
 def show_assessment_page():
     """Main assessment page with questions"""
