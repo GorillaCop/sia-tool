@@ -362,22 +362,22 @@ def show_assessment_page():
     
     st.markdown('---')
     
-    # Navigation buttons
+ # Navigation buttons
     col1, col2, col3 = st.columns([1, 1, 1])
-    
+
     with col1:
-    if lifeline_idx > 0:
+        if lifeline_idx > 0:
         if st.button('← Previous Lifeline', use_container_width=True):
             st.session_state.current_lifeline -= 1
             scroll_to_top()
             st.rerun()
 
     with col2:
-    if st.button('Save Progress', use_container_width=True):
+        if st.button('Save Progress', use_container_width=True):
         st.success('Progress saved!')
 
     with col3:
-    if lifeline_idx < len(LIFELINES) - 1:
+        if lifeline_idx < len(LIFELINES) - 1:
         if st.button('Next Lifeline →', use_container_width=True):
             st.session_state.current_lifeline += 1
             scroll_to_top()
