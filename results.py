@@ -7,7 +7,10 @@ import streamlit as st
 import plotly.graph_objects as go
 from collections import Counter
 import json
-
+from pathlib import Path
+import base64
+from jinja2 import Template
+from weasyprint import HTML
 
 def analyze_responses():
     """Analyze responses and generate insights"""
