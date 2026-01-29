@@ -4,26 +4,26 @@ services:
     runtime: python
     plan: free
     region: oregon
-    buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run streamlit_app.py --server.address=0.0.0.0 --server.port=$PORT --server.headless=true
+
+    # Install Streamlit + PDF dependencies
+    buildCommand: pip install -r streamlit_requirements.txt
+
+    # Start Streamlit correctly on Render
+    startCommand: streamlit run streamlit_app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true
+
     healthCheckPath: /
     autoDeploy: true
+
+    # REQUIRED for WeasyPrint PDF generation
+    aptPackages:
+      - libcairo2
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libgdk-pixbuf-2.0-0
+      - shared-mime-info
 
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
-      # Keep these ONLY if your Streamlit app actually uses them:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: signal-integrity-db
-          property: connectionString
       - key: SECRET_KEY
         generateValue: true
-
-databases:
-  - name: signal-integrity-db
-    plan: free
-    databaseName: signal_integrity
-    user: signal_user
-    region: oregon
-
