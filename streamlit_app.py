@@ -372,10 +372,10 @@ with col1:
             scroll_to_top()
             st.rerun()
 
-    with col2:
-        if st.button('Save Progress', use_container_width=True):
-            st.success('Progress saved!')
-    
+with col2:
+    if st.button('Save Progress', use_container_width=True):
+        st.success('Progress saved!')
+
 with col3:
     if lifeline_idx < len(LIFELINES) - 1:
         if st.button('Next Lifeline →', use_container_width=True):
@@ -387,8 +387,6 @@ with col3:
             st.session_state.page = 'results'
             scroll_to_top()
             st.rerun()
-
-
 
 def main():
     """Main application router"""
