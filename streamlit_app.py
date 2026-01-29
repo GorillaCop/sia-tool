@@ -402,22 +402,22 @@ if st.session_state.get("force_scroll_top", False):
     
     st.markdown('---')
     
-# Navigation buttons
-col1, col2, col3 = st.columns([1, 1, 1])
+    # Navigation buttons
+    col1, col2, col3 = st.columns([1, 1, 1])
 
-with col1:
-    if lifeline_idx > 0:
+    with col1:
+        if lifeline_idx > 0:
         if st.button('← Previous Lifeline', use_container_width=True):
             st.session_state.current_lifeline -= 1
             scroll_to_top()
             st.rerun()
 
-with col2:
-    if st.button('Save Progress', use_container_width=True):
-        st.success('Progress saved!')
+    with col2:
+        if st.button('Save Progress', use_container_width=True):
+            st.success('Progress saved!')
 
-with col3:
-    if lifeline_idx < len(LIFELINES) - 1:
+    with col3:
+        if lifeline_idx < len(LIFELINES) - 1:
         if st.button('Next Lifeline →', use_container_width=True):
             st.session_state.current_lifeline += 1
             scroll_to_top()
