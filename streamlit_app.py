@@ -301,10 +301,25 @@ def scroll_to_top():
     components.html(
         """
         <script>
-        const main = window.parent.document.querySelector('section.main');
-        if (main) { main.scrollTo(0, 0); }
-        window.parent.scrollTo(0, 0);
-        window.scrollTo(0, 0);
+          // Try a few targets Streamlit uses, then fall back to window
+          const targets = [
+            window,
+            document.documentElement,
+            document.body,
+            window.parent,
+            window.parent?.document?.documentElement,
+            window.parent?.document?.body,
+            window.parent?.document?.querySelector('section.main'),
+            window.parent?.document?.querySelector('[data-testid="stAppViewContainer"]'),
+            window.parent?.document?.querySelector('[data-testid="stApp"]'),
+          ].filter(Boolean);
+
+          targets.forEach(t => {
+            try {
+              if (t.scrollTo) t.scrollTo(0, 0);
+              if (t.scrollTop !== undefined) t.scrollTop = 0;
+            } catch(e) {}
+          });
         </script>
         """,
         height=0,
