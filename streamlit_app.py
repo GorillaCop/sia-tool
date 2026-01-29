@@ -358,25 +358,25 @@ def show_assessment_page():
         st.session_state.force_scroll_top = False
 
     lifeline = LIFELINES[lifeline_idx]
-# Header
-st.title("Signal Integrity Assessment™")
-st.markdown(f"**{st.session_state.org_name}** • {st.session_state.assessment_date}")
+    # Header
+    st.title("Signal Integrity Assessment™")
+    st.markdown(f"**{st.session_state.org_name}** • {st.session_state.assessment_date}")
 
-# Progress indicator
-progress = (lifeline_idx + 1) / len(LIFELINES)
-st.progress(progress)
-st.markdown(
+    # Progress indicator
+    progress = (lifeline_idx + 1) / len(LIFELINES)
+    st.progress(progress)
+    st.markdown(
     f"Business Lifeline {lifeline_idx + 1} of {len(LIFELINES)} • {int(progress * 100)}% Complete"
-)
+    )
 
-st.markdown("---")
+    st.markdown("---")
 
-# Lifeline header
-st.subheader(f"🎯 {lifeline.get('name', 'Business Lifeline')}")
+    # Lifeline header
+    st.subheader(f"🎯 {lifeline.get('name', 'Business Lifeline')}")
 
-# Questions
-questions = lifeline.get("questions", [])
-for q_idx, question in enumerate(questions):
+    # Questions
+    questions = lifeline.get("questions", [])
+    for q_idx, question in enumerate(questions):
     key_base = f"{lifeline_idx}_{q_idx}"
 
     st.markdown("----")
@@ -397,34 +397,34 @@ for q_idx, question in enumerate(questions):
             st.session_state.responses.get(f"{key_base}_signal", SIGNAL_TYPES[0])
         ),
         key=f"{key_base}_signal_input",
-    )
+        )
 
-    # Save to session state
-    st.session_state.responses[f"{key_base}_response"] = response
-    st.session_state.responses[f"{key_base}_signal"] = signal_type
+        # Save to session state
+        st.session_state.responses[f"{key_base}_response"] = response
+        st.session_state.responses[f"{key_base}_signal"] = signal_type
+    
+    st.markdown("---")
 
-st.markdown("---")
+    # Navigation buttons
+    col1, col2, col3 = st.columns([1, 1, 1])
 
-# Navigation buttons
-col1, col2, col3 = st.columns([1, 1, 1])
-
-with col1:
+    with col1:
     if lifeline_idx > 0:
         if st.button("← Previous Lifeline", use_container_width=True):
             st.session_state.current_lifeline -= 1
             st.session_state.force_scroll_top = True
             st.rerun()
 
-with col2:
+    with col2:
     if st.button("Save Progress", use_container_width=True):
         st.success("Progress saved!")
 
-with col3:
-    if lifeline_idx < len(LIFELINES) - 1:
-        if st.button("Next Lifeline →", use_container_width=True):
-            st.session_state.current_lifeline += 1
-            st.session_state.force_scroll_top = True
-            st.rerun()
+    with col3:
+        if lifeline_idx < len(LIFELINES) - 1:
+            if st.button("Next Lifeline →", use_container_width=True):
+                st.session_state.current_lifeline += 1
+                st.session_state.force_scroll_top = True
+                st.rerun()
     else:
         if st.button("Generate Assessment →", use_container_width=True, type="primary"):
             st.session_state.page = "results"
