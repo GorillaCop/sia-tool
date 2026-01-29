@@ -384,9 +384,9 @@ def show_assessment_page():
              st.rerun()
         else:
             if st.button('Generate Assessment →', use_container_width=True, type='primary'):
-            st.session_state.page = 'results'
-            scroll_to_top()
-            st.rerun()
+                st.session_state.page = 'results'
+                scroll_to_top()
+                st.rerun()
 
 def main():
     """Main application router"""
