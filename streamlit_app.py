@@ -292,6 +292,7 @@ def show_metadata_page():
             st.session_state.assessment_date = assessment_date
             st.session_state.page = 'assessment'
             st.session_state.current_lifeline = 0
+            st.session_state.force_scroll_top = True
             st.rerun()
         else:
             st.error('Please enter an organization name to continue.')
