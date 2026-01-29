@@ -6,6 +6,51 @@ Streamlit Application - Main Entry Point
 import streamlit as st
 from datetime import date
 import json
+from pathlib import Path
+def render_brand_header(title: str, subtitle: str | None = None):
+    """Quiet-luxury header: small logo top-left, title to the right."""
+    left, right = st.columns([1, 6], vertical_alignment="center")
+
+    with left:
+        if LOGO_MONO_PATH.exists():
+            st.image(str(LOGO_MONO_PATH), width=95)
+        else:
+            st.markdown("")
+
+    with right:
+        st.markdown(f"# {title}")
+        if subtitle:
+            st.markdown(f"*{subtitle}*")
+
+def render_footer(show_prepared_by: bool = False):
+    """Discreet footer on every screen."""
+    extra = f"<br><span style='font-size:9px;'>{FOOTER_SUBTEXT}</span>" if show_prepared_by else ""
+    st.markdown(
+        f"""
+        <style>
+          .sw-footer {{
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            padding: 8px 0;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 10px;
+            background: rgba(255,255,255,0.85);
+            border-top: 1px solid #e5e7eb;
+            z-index: 999;
+          }}
+        </style>
+        <div class="sw-footer">{FOOTER_TEXT}{extra}</div>
+        """,
+        unsafe_allow_html=True
+    )
+
+LOGO_MONO_PATH = Path("assets/southwind_logo_mono_navy.png")
+
+FOOTER_TEXT = "Southwind Planning • Readiness Is Not a Plan. It’s a Capability."
+FOOTER_SUBTEXT = "Prepared by Mike McCracken • 2026"
 
 APP_VERSION = "2026-01-28b"
 
