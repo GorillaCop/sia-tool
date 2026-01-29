@@ -372,7 +372,6 @@ with col1:
             scroll_to_top()
             st.rerun()
 
-    
     with col2:
         if st.button('Save Progress', use_container_width=True):
             st.success('Progress saved!')
