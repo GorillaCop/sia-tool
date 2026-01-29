@@ -348,7 +348,7 @@ def show_assessment_page():
     if lifeline_idx < 0:
         lifeline_idx = 0
         st.session_state.current_lifeline = 0
-    if lifeline_idx >= len(LIFELINES):
+   if lifeline_idx >= len(LIFELINES):
         lifeline_idx = len(LIFELINES) - 1
         st.session_state.current_lifeline = lifeline_idx
 
