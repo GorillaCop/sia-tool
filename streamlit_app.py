@@ -313,7 +313,11 @@ def show_assessment_page():
     """Main assessment page with questions"""
     lifeline_idx = st.session_state.current_lifeline
     lifeline = LIFELINES[lifeline_idx]
-    
+    # ✅ Force scroll-to-top AFTER rerun (on new render)
+if st.session_state.get("force_scroll_top", False):
+    scroll_to_top()
+    st.session_state.force_scroll_top = False
+
     # Header
     st.title('Signal Integrity Assessment™')
     st.markdown(f"**{st.session_state.org_name}** • {st.session_state.assessment_date}")
