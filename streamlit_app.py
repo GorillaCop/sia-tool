@@ -382,7 +382,7 @@ def show_assessment_page():
              st.session_state.current_lifeline += 1
              scroll_to_top()
              st.rerun()
-    else:
+        else:
         if st.button('Generate Assessment →', use_container_width=True, type='primary'):
             st.session_state.page = 'results'
             scroll_to_top()
