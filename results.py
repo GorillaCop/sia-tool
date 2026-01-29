@@ -541,7 +541,9 @@ def show_results_page():
     st.header('Export Options')
     
     col1, col2 = st.columns(2)
-    with col1:
+ col1, col2 = st.columns(2)
+
+with col1:
     if st.button("📄 Build Executive Brief (HTML)", use_container_width=True):
         with st.spinner("Building your executive brief..."):
 
@@ -553,6 +555,26 @@ def show_results_page():
 
             # Build the Executive Brief HTML
             brief_html = build_executive_brief_html(
+                org_name=st.session_state.org_name,
+                assessment_date=str(st.session_state.assessment_date),
+                analysis=analysis,
+                map_png_b64=map_png_b64
+            )
+
+        safe_org = st.session_state.org_name.replace(" ", "_")
+        st.download_button(
+            label="Download Executive Brief",
+            data=brief_html.encode("utf-8"),
+            file_name=f"Signal_Integrity_Brief_{safe_org}_{st.session_state.assessment_date}.html",
+            mime="text/html",
+            use_container_width=True
+        )
+
+        st.info("Designed for board circulation. Open in Chrome → Print → Save as PDF.")
+
+with col2:
+    st.caption("Confidential diagnostic • Prepared for internal leadership use")
+
                 org_name=st.session_state.org_name,
                 assessment_date=str(st.session_state.assessment_date),
                 analysis=analysis,
