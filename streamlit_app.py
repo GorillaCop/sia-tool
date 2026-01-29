@@ -310,24 +310,20 @@ def scroll_to_top():
     )
 
 def show_assessment_page():
-    st.write("DEBUG: assessment page loaded")
-    st.write("Main assessment page with questions")
-
     lifeline_idx = st.session_state.get("current_lifeline", 0)
 
-    # hard safety clamp
-    if "LIFELINES" not in globals():
-        st.error("LIFELINES is not defined in this file.")
-        st.stop()
-
-    if not isinstance(LIFELINES, list) or len(LIFELINES) == 0:
-        st.error("LIFELINES is empty or not a list.")
-        st.stop()
-
-    if lifeline_idx < 0 or lifeline_idx >= len(LIFELINES):
-        st.warning(f"current_lifeline out of range ({lifeline_idx}). Resetting to 0.")
-        st.session_state.current_lifeline = 0
+    # keep index in range
+    if lifeline_idx < 0:
         lifeline_idx = 0
+        st.session_state.current_lifeline = 0
+    if lifeline_idx >= len(LIFELINES):
+        lifeline_idx = len(LIFELINES) - 1
+        st.session_state.current_lifeline = lifeline_idx
+
+    # Force scroll-to-top AFTER rerun (on new render)
+    if st.session_state.get("force_scroll_top", False):
+        scroll_to_top()
+        st.session_state.force_scroll_top = False
 
     lifeline = LIFELINES[lifeline_idx]
 
