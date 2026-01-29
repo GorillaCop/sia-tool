@@ -375,11 +375,12 @@ def show_assessment_page():
     st.subheader(f"🎯 {lifeline.get('name', 'Business Lifeline')}")
 
     # Questions
-    questions = lifeline.get("questions", [])
-    for q_idx, question in enumerate(questions):
+questions = lifeline.get("questions", [])
+
+for q_idx, question in enumerate(questions):
     key_base = f"{lifeline_idx}_{q_idx}"
 
-    st.markdown("----")
+    st.markdown("---")
     st.markdown(f"**Question {q_idx + 1} of {len(questions)}**")
     st.markdown(f"*{question}*")
 
@@ -397,11 +398,12 @@ def show_assessment_page():
             st.session_state.responses.get(f"{key_base}_signal", SIGNAL_TYPES[0])
         ),
         key=f"{key_base}_signal_input",
-        )
+    )
 
-        # Save to session state
-        st.session_state.responses[f"{key_base}_response"] = response
-        st.session_state.responses[f"{key_base}_signal"] = signal_type
+    # Save to session state
+    st.session_state.responses[f"{key_base}_response"] = response
+    st.session_state.responses[f"{key_base}_signal"] = signal_type
+
     
     st.markdown("---")
 
