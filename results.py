@@ -288,6 +288,131 @@ def create_network_signal_map(analysis):
     )
     
     return fig
+def build_pdf_html(org_name: str, assessment_date: str, analysis: dict, map_png_b64: str | None):
+    logo_b64 = file_to_base64(LOGO_COLOR_PATH)
+
+    strength = {"SOLID": 4, "CONDITIONAL": 3, "MIXED": 2, "FRAGILE": 1}
+    strongest = max(analysis.items(), key=lambda kv: strength.get(kv[1]["status"], 0))
+    weakest = min(analysis.items(), key=lambda kv: strength.get(kv[1]["status"], 9))
+    strong_name, strong_data = strongest
+    weak_name, weak_data = weakest
+
+    framing = (
+        f"In this assessment for <b>{org_name}</b>, the strongest signal integrity appears in "
+        f"<b>{strong_name}</b> (<b>{strong_data['status']}</b>), while <b>{weak_name}</b> shows the highest fragility "
+        f"(<b>{weak_data['status']}</b>)."
+    )
+
+    grid_rows = []
+    for lf, data in analysis.items():
+        sig = data["signals"]
+        grid_rows.append({
+            "lifeline": lf,
+            "status": data["status"],
+            "pattern": f"Observed {sig.get('Observed',0)} • Assumed {sig.get('Assumed',0)} • Historical {sig.get('Historical',0)} • Compensated {sig.get('Compensated',0)}"
+        })
+
+    template = Template(r"""
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: Letter; margin: 0.65in; }
+  body { font-family: Arial, sans-serif; color: #111827; }
+  .header { border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 12px; }
+  .logo { height: 44px; }
+  .title { font-size: 22px; font-weight: 700; margin-top: 8px; }
+  .subtitle { font-size: 12px; color: #374151; margin-top: 2px; }
+  .meta { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .framing { margin: 12px 0; font-size: 12.5px; line-height: 1.45; }
+  .section-title { margin-top: 14px; font-weight: 700; font-size: 12.5px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { border: 1px solid #e5e7eb; padding: 7px; font-size: 11px; vertical-align: top; }
+  th { background: #f9fafb; }
+  .badge { font-weight: 700; }
+  .SOLID { color: #065f46; }
+  .CONDITIONAL { color: #92400e; }
+  .MIXED { color: #374151; }
+  .FRAGILE { color: #991b1b; }
+  .map img { width: 100%; border: 1px solid #e5e7eb; border-radius: 6px; margin-top: 8px; }
+  .ref { background: #f8fafc; border-left: 3px solid #111827; padding: 10px; margin-top: 10px; font-size: 11.5px; }
+  .footer {
+    position: fixed; bottom: 0.35in; left: 0.65in; right: 0.65in;
+    font-size: 9px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 6px;
+  }
+  .watermark {
+    position: fixed; top: 38%; left: 8%;
+    font-size: 40px; color: rgba(17,24,39,0.05);
+    transform: rotate(-20deg);
+  }
+</style>
+</head>
+<body>
+  <div class="watermark">CONFIDENTIAL • SOUTHWIND PLANNING</div>
+
+  <div class="header">
+    {% if logo_b64 %}
+      <img class="logo" src="data:image/png;base64,{{ logo_b64 }}" />
+    {% endif %}
+    <div class="title">Signal Integrity Assessment™</div>
+    <div class="subtitle">A structured executive diagnostic on decision information reliability</div>
+    <div class="meta">Prepared for <b>{{ org_name }}</b> • {{ assessment_date }}</div>
+  </div>
+
+  <div class="framing">{{ framing | safe }}</div>
+
+  <div class="section-title">Lifeline Integrity Grid</div>
+  <table>
+    <thead>
+      <tr><th>Lifeline</th><th>Status</th><th>Signal Pattern</th></tr>
+    </thead>
+    <tbody>
+    {% for r in grid_rows %}
+      <tr>
+        <td>{{ r.lifeline }}</td>
+        <td class="badge {{ r.status }}">{{ r.status }}</td>
+        <td>{{ r.pattern }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% if map_png_b64 %}
+    <div class="section-title">Signal Map</div>
+    <div class="map"><img src="data:image/png;base64,{{ map_png_b64 }}" /></div>
+  {% endif %}
+
+  <div class="section-title">Reflection Prompts</div>
+  <div class="ref">
+    <ul>
+      <li>Which lifeline would matter most under pressure—and why?</li>
+      <li>Where is continuity dependent on people rather than visibility?</li>
+      <li>What would you verify before your next major decision?</li>
+      <li>Where might stability be subsidized by heroics?</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    {{ contact_line }}<br>
+    Confidential diagnostic prepared for internal leadership use. This instrument highlights decision visibility and information integrity; it does not prescribe solutions.
+  </div>
+</body>
+</html>
+""")
+
+    return template.render(
+        logo_b64=logo_b64,
+        org_name=org_name,
+        assessment_date=assessment_date,
+        framing=framing,
+        grid_rows=grid_rows,
+        map_png_b64=map_png_b64,
+        contact_line=CONTACT_LINE
+    )
+
+def generate_pdf_bytes(html: str) -> bytes:
+    return HTML(string=html).write_pdf()
 
 
 def show_results_page():
