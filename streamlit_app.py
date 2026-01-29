@@ -405,9 +405,6 @@ if st.session_state.get("force_scroll_top", False):
     
     st.markdown('---')
     
-# Navigation buttons
-col1, col2, col3 = st.columns([1, 1, 1])
-
 with col1:
     if lifeline_idx > 0:
         if st.button("← Previous Lifeline", use_container_width=True):
