@@ -546,9 +546,35 @@ def show_results_page():
     
     col1, col2 = st.columns(2)
     
-    with col1:
-        if st.button('📄 Download PDF Report', use_container_width=True):
-            st.info('PDF generation coming soon!')
+with col1:
+    if st.button("📄 Build PDF Report", use_container_width=True):
+
+        # Create the signal map figure (already used on the page)
+        fig = create_network_signal_map(analysis)
+
+        # Convert the figure to PNG (for embedding in PDF)
+        map_png_b64 = fig_to_png_base64(fig)
+
+        # Build the PDF HTML
+        pdf_html = build_pdf_html(
+            org_name=st.session_state.org_name,
+            assessment_date=str(st.session_state.assessment_date),
+            analysis=analysis,
+            map_png_b64=map_png_b64
+        )
+
+        # Generate PDF bytes in memory
+        pdf_bytes = generate_pdf_bytes(pdf_html)
+
+        # Download button
+        st.download_button(
+            label="Download PDF",
+            data=pdf_bytes,
+            file_name=f"Signal_Integrity_Assessment_{st.session_state.org_name}_{st.session_state.assessment_date}.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
+
     
     with col2:
         # Export data as JSON
