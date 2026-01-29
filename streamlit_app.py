@@ -235,7 +235,7 @@ SIGNAL_TYPES = [
 
 def show_metadata_page():
     """Metadata collection page"""
-  render_brand_header(
+    render_brand_header(
     "Signal Integrity Assessment™",
     "A structured executive diagnostic on decision information reliability."
 )
