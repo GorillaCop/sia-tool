@@ -541,7 +541,7 @@ def show_results_page():
     st.header('Export Options')
     
     col1, col2 = st.columns(2)
-   with col1:
+    with col1:
     if st.button("📄 Build Executive Brief (HTML)", use_container_width=True):
         with st.spinner("Building your executive brief..."):
 
