@@ -12,6 +12,23 @@ import base64
 from jinja2 import Template
 from weasyprint import HTML
 
+LOGO_COLOR_PATH = Path("assets/southwind_logo_color_tuned.png")
+TAGLINE = "Readiness Is Not a Plan. It’s a Capability."
+CONTACT_LINE = "Southwind Planning • mike@southwindplanning.com • " + TAGLINE
+
+def file_to_base64(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    return base64.b64encode(path.read_bytes()).decode("utf-8")
+
+def fig_to_png_base64(fig) -> str | None:
+    try:
+        import plotly.io as pio
+        png_bytes = pio.to_image(fig, format="png", width=1400, height=820, scale=2)
+        return base64.b64encode(png_bytes).decode("utf-8")
+    except Exception:
+        return None
+
 def analyze_responses():
     """Analyze responses and generate insights"""
     lifeline_analysis = {}
