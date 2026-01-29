@@ -383,7 +383,7 @@ def show_assessment_page():
              scroll_to_top()
              st.rerun()
         else:
-        if st.button('Generate Assessment →', use_container_width=True, type='primary'):
+            if st.button('Generate Assessment →', use_container_width=True, type='primary'):
             st.session_state.page = 'results'
             scroll_to_top()
             st.rerun()
