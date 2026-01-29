@@ -311,10 +311,8 @@ def scroll_to_top():
 
 def show_assessment_page():
     st.write("DEBUG: assessment page loaded")
-    try:
-        st.write("Main assessment page with questions")
+    st.write("Main assessment page with questions")
 
-    # --- EVERYTHING ELSE in this function goes below here ---
     lifeline_idx = st.session_state.get("current_lifeline", 0)
 
     # hard safety clamp
@@ -330,6 +328,9 @@ def show_assessment_page():
         st.warning(f"current_lifeline out of range ({lifeline_idx}). Resetting to 0.")
         st.session_state.current_lifeline = 0
         lifeline_idx = 0
+
+    lifeline = LIFELINES[lifeline_idx]
+
 
     lifeline = LIFELINES[lifeline_idx]
 
