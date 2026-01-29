@@ -311,6 +311,46 @@ def scroll_to_top():
 
 def show_assessment_page():
     st.write("DEBUG: assessment page loaded")
+    try:
+    st.write("Main assessment page with questions")
+
+    # --- EVERYTHING ELSE in this function goes below here ---
+    lifeline_idx = st.session_state.get("current_lifeline", 0)
+
+    # hard safety clamp
+    if "LIFELINES" not in globals():
+        st.error("LIFELINES is not defined in this file.")
+        st.stop()
+
+    if not isinstance(LIFELINES, list) or len(LIFELINES) == 0:
+        st.error("LIFELINES is empty or not a list.")
+        st.stop()
+
+    if lifeline_idx < 0 or lifeline_idx >= len(LIFELINES):
+        st.warning(f"current_lifeline out of range ({lifeline_idx}). Resetting to 0.")
+        st.session_state.current_lifeline = 0
+        lifeline_idx = 0
+
+    lifeline = LIFELINES[lifeline_idx]
+
+    # prove structure
+    if not isinstance(lifeline, dict):
+        st.error("A lifeline entry is not a dict.")
+        st.write(lifeline)
+        st.stop()
+
+    if "questions" not in lifeline:
+        st.error("This lifeline has no 'questions' key.")
+        st.write(lifeline)
+        st.stop()
+
+    st.write(f"Loaded lifeline: {lifeline.get('name','(no name)')} with {len(lifeline['questions'])} questions")
+
+    # (then your existing rendering code continues here...)
+
+except Exception as e:
+    st.exception(e)
+    st.stop()
 
     """Main assessment page with questions"""
     lifeline_idx = st.session_state.current_lifeline
