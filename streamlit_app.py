@@ -389,17 +389,6 @@ for q_idx, question in enumerate(questions):
 
 st.markdown("---")
 
-    # prove structure
-    if not isinstance(lifeline, dict):
-        st.error("A lifeline entry is not a dict.")
-        st.write(lifeline)
-        st.stop()
-
-    if "questions" not in lifeline:
-        st.error("This lifeline has no 'questions' key.")
-        st.write(lifeline)
-        st.stop()
-
 # Navigation buttons
 col1, col2, col3 = st.columns([1, 1, 1])
 
