@@ -60,6 +60,22 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+# --- Session state initialization (must run before any page renders) ---
+if "page" not in st.session_state:
+    st.session_state.page = "metadata"
+
+if "org_name" not in st.session_state:
+    st.session_state.org_name = ""
+
+if "assessment_date" not in st.session_state:
+    from datetime import date
+    st.session_state.assessment_date = date.today()
+
+if "current_lifeline" not in st.session_state:
+    st.session_state.current_lifeline = 0
+
+if "responses" not in st.session_state:
+    st.session_state.responses = {}
 
 # ✅ GLOBAL TAGLINE (safe, top-level, not inside any function)
 st.markdown(
