@@ -5,16 +5,12 @@ services:
     plan: free
     region: oregon
 
-    # Install Streamlit + PDF dependencies
     buildCommand: pip install -r streamlit_requirements.txt
 
-    # Start Streamlit correctly on Render
     startCommand: streamlit run streamlit_app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true
-
     healthCheckPath: /
     autoDeploy: true
 
-    # REQUIRED for WeasyPrint PDF generation
     aptPackages:
       - libcairo2
       - libpango-1.0-0
@@ -27,3 +23,4 @@ services:
         value: 3.11.0
       - key: SECRET_KEY
         generateValue: true
+
