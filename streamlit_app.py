@@ -235,30 +235,37 @@ SIGNAL_TYPES = [
 
 def show_metadata_page():
     """Metadata collection page"""
-    render_brand_header(
-    "Signal Integrity Assessment™",
-    "A structured executive diagnostic on decision information reliability."
-)
-render_footer(show_prepared_by=False)
 
-    st.markdown('*A structured executive diagnostic that reveals where leadership decisions are supported by verified information—and where they depend on assumptions, workarounds, or individual effort.*')
-    
-    st.markdown('---')
-    
+    render_brand_header(
+        "Signal Integrity Assessment™",
+        "A structured executive diagnostic on decision information reliability."
+    )
+    render_footer(show_prepared_by=False)
+
+    st.markdown(
+        "*A structured executive diagnostic that reveals where leadership decisions are supported by verified information—and where they depend on assumptions, workarounds, or individual effort.*"
+    )
+
+    st.markdown("---")
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
         org_name = st.text_input(
-            'Organization Name',
-            value=st.session_state.get('org_name', ''),
-            help='Enter your organization or company name'
+            "Organization Name",
+            value=st.session_state.get("org_name", ""),
+            help="Enter your organization or company name"
         )
-    
+
     with col2:
         assessment_date = st.date_input(
-            'Assessment Date',
-            value=st.session_state.get('assessment_date', date.today())
+            "Assessment Date",
+            value=st.session_state.get("assessment_date", date.today())
         )
+
+    st.session_state["org_name"] = org_name
+    st.session_state["assessment_date"] = assessment_date
+
     
     st.markdown('---')
     
