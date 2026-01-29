@@ -554,6 +554,17 @@ with col1:
             map_png_b64 = fig_to_png_base64(fig)
 
             # Build the Executive Brief HTML
+st.header("Executive Brief")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("📄 Build Executive Brief", use_container_width=True):
+        with st.spinner("Building your executive brief..."):
+
+            fig = create_network_signal_map(analysis)
+            map_png_b64 = fig_to_png_base64(fig)
+
             brief_html = build_executive_brief_html(
                 org_name=st.session_state.org_name,
                 assessment_date=str(st.session_state.assessment_date),
@@ -575,46 +586,27 @@ with col1:
 with col2:
     st.caption("Confidential diagnostic • Prepared for internal leadership use")
 
-                org_name=st.session_state.org_name,
-                assessment_date=str(st.session_state.assessment_date),
-                analysis=analysis,
-                map_png_b64=map_png_b64
-            )
+    # Export data as JSON
+    export_data = {
+        'organization': st.session_state.org_name,
+        'assessment_date': str(st.session_state.assessment_date),
+        'analysis': {k: {
+            'status': v['status'],
+            'description': v['description'],
+            'signals': dict(v['signals'])
+        } for k, v in analysis.items()}
+    }
 
-        safe_org = st.session_state.org_name.replace(" ", "_")
-        st.download_button(
-            label="Download Executive Brief (HTML)",
-            data=brief_html.encode("utf-8"),
-            file_name=f"Signal_Integrity_Brief_{safe_org}_{st.session_state.assessment_date}.html",
-            mime="text/html",
-            use_container_width=True
-        )
+    safe_org = st.session_state.org_name.replace(" ", "_")
 
-        st.info("Tip: Open the downloaded file in Chrome → Print → Save as PDF for a board-ready PDF.")
+    st.download_button(
+        label="📥 Download Data (JSON)",
+        data=json.dumps(export_data, indent=2),
+        file_name=f"Signal_Integrity_Data_{safe_org}_{st.session_state.assessment_date}.json",
+        mime="application/json",
+        use_container_width=True
+    )
 
-
-    
-    with col2:
-        # Export data as JSON
-        export_data = {
-            'organization': st.session_state.org_name,
-            'assessment_date': str(st.session_state.assessment_date),
-            'analysis': {k: {
-                'status': v['status'],
-                'description': v['description'],
-                'signals': dict(v['signals'])
-            } for k, v in analysis.items()}
-        }
-
-        safe_org = st.session_state.org_name.replace(" ", "_")
-
-        st.download_button(
-            label='💾 Download Data (JSON)',
-            data=json.dumps(export_data, indent=2),
-            file_name=f'signal_integrity_{safe_org}_{st.session_state.assessment_date}.json',
-            mime='application/json',
-            use_container_width=True
-        )
 
     
     # Restart option
