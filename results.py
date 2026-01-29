@@ -544,35 +544,35 @@ def show_results_page():
     st.header('Export Options')
     
     col1, col2 = st.columns(2)
-    
-with col1:
-    if st.button("📄 Build PDF Report", use_container_width=True):
+   with col1:
+    if st.button("📄 Build Executive Brief (HTML)", use_container_width=True):
+        with st.spinner("Building your executive brief..."):
 
-        # Create the signal map figure (already used on the page)
-        fig = create_network_signal_map(analysis)
+            # Create the signal map figure (already used on the page)
+            fig = create_network_signal_map(analysis)
 
-        # Convert the figure to PNG (for embedding in PDF)
-        map_png_b64 = fig_to_png_base64(fig)
+            # Convert the figure to PNG (for embedding in the brief)
+            map_png_b64 = fig_to_png_base64(fig)
 
-        # Build the PDF HTML
-        pdf_html = build_pdf_html(
-            org_name=st.session_state.org_name,
-            assessment_date=str(st.session_state.assessment_date),
-            analysis=analysis,
-            map_png_b64=map_png_b64
-        )
+            # Build the Executive Brief HTML
+            brief_html = build_executive_brief_html(
+                org_name=st.session_state.org_name,
+                assessment_date=str(st.session_state.assessment_date),
+                analysis=analysis,
+                map_png_b64=map_png_b64
+            )
 
-        # Generate PDF bytes in memory
-        pdf_bytes = generate_pdf_bytes(pdf_html)
-
-        # Download button
+        safe_org = st.session_state.org_name.replace(" ", "_")
         st.download_button(
-            label="Download PDF",
-            data=pdf_bytes,
-            file_name=f"Signal_Integrity_Assessment_{st.session_state.org_name}_{st.session_state.assessment_date}.pdf",
-            mime="application/pdf",
+            label="Download Executive Brief (HTML)",
+            data=brief_html.encode("utf-8"),
+            file_name=f"Signal_Integrity_Brief_{safe_org}_{st.session_state.assessment_date}.html",
+            mime="text/html",
             use_container_width=True
         )
+
+        st.info("Tip: Open the downloaded file in Chrome → Print → Save as PDF for a board-ready PDF.")
+
 
     
     with col2:
