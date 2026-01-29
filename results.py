@@ -9,8 +9,7 @@ from collections import Counter
 import json
 from pathlib import Path
 import base64
-from jinja2 import Template
-from weasyprint import HTML
+
 
 LOGO_COLOR_PATH = Path("assets/southwind_logo_color_tuned.png")
 TAGLINE = "Readiness Is Not a Plan. It’s a Capability."
