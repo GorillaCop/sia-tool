@@ -287,7 +287,7 @@ def create_network_signal_map(analysis):
     )
     
     return fig
-def build_pdf_html(org_name: str, assessment_date: str, analysis: dict, map_png_b64: str | None):
+def build_executive_brief_html(org_name: str, assessment_date: str, analysis: dict, map_png_b64: str | None):
     logo_b64 = file_to_base64(LOGO_COLOR_PATH)
 
     strength = {"SOLID": 4, "CONDITIONAL": 3, "MIXED": 2, "FRAGILE": 1}
