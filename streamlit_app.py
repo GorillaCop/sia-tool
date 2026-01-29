@@ -331,9 +331,6 @@ def show_assessment_page():
 
     lifeline = LIFELINES[lifeline_idx]
 
-
-    lifeline = LIFELINES[lifeline_idx]
-
     # prove structure
     if not isinstance(lifeline, dict):
         st.error("A lifeline entry is not a dict.")
@@ -405,25 +402,25 @@ if st.session_state.get("force_scroll_top", False):
     
     st.markdown('---')
     
-with col1:
-    if lifeline_idx > 0:
+    with col1:
+        if lifeline_idx > 0:
         if st.button("← Previous Lifeline", use_container_width=True):
             st.session_state.current_lifeline -= 1
-            st.rerun()
+             st.rerun()
 
-with col2:
-    if st.button("Save Progress", use_container_width=True):
+    with col2:
+        if st.button("Save Progress", use_container_width=True):
         st.success("Progress saved!")
 
-with col3:
-    if lifeline_idx < len(LIFELINES) - 1:
+    with col3:
+        if lifeline_idx < len(LIFELINES) - 1:
         if st.button("Next Lifeline →", use_container_width=True):
             st.session_state.current_lifeline += 1
-            st.rerun()
+             st.rerun()
     else:
         if st.button("Generate Assessment →", use_container_width=True, type="primary"):
             st.session_state.page = "results"
-            st.rerun()
+             st.rerun()
 
 def main():
     """Main application router"""
