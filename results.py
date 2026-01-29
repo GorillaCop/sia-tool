@@ -410,9 +410,6 @@ def build_executive_brief_html(org_name: str, assessment_date: str, analysis: di
         contact_line=CONTACT_LINE
     )
 
-def generate_pdf_bytes(html: str) -> bytes:
-    return HTML(string=html).write_pdf()
-
 
 def show_results_page():
     """Display results with visualizations"""
