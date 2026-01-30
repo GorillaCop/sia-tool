@@ -503,7 +503,7 @@ def show_results_page():
     st.markdown('---')
 
     # Section 6: Restart Option
-    if st.button('Start New Assessment', use_container_width=False): [cite: 975, 976]
+    if st.button("Start New Assessment", use_container_width=False):
         for key in list(st.session_state.keys()): [cite: 978]
             del st.session_state[key] [cite: 979]
         st.rerun() [cite: 980]
