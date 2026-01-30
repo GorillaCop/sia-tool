@@ -454,20 +454,20 @@ def show_results_page():
             "FRAGILE": "🔴",
     }
 
-        # Safety: analysis must exist and be a dict
-        if not isinstance(analysis, dict) or not analysis:
-            st.error("No analysis found. Please complete the assessment first.")
-            return
+            # Safety: analysis must exist and be a dict
+    if not isinstance(analysis, dict) or not analysis:
+        st.error("No analysis found. Please complete the assessment first.")
+        return
 
-        for lifeline_name, data in analysis.items():
-            status = (data.get("status") or "MIXED").upper()
-            desc = data.get("description", "")
+    for lifeline_name, data in analysis.items():
+        status = (data.get("status") or "MIXED").upper()
+        desc = data.get("description", "")
 
-            icon = status_color.get(status, "⚪")
-            st.subheader(f"{icon} {lifeline_name} — {status}")
+        icon = status_color.get(status, "⚪")
+        st.subheader(f"{icon} {lifeline_name} — {status}")
 
-            if desc:
-                st.write(desc)
+        if desc:
+            st.write(desc)
 
     # Section 2: Signal Map Visualization
     st.header("Signal Integrity Map")
@@ -479,6 +479,14 @@ def show_results_page():
         "Visualization Style",
         ["Radar Chart", "Network Map"],
         horizontal=True
+    )
+
+    if viz_type == "Radar Chart":
+        fig = create_signal_map(analysis)
+    else:
+        fig = create_network_signal_map(analysis)
+
+    st.plotly_chart(fig, use_container_width=True)
     )
 
     if viz_type == "Radar Chart":
