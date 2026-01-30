@@ -4,5 +4,6 @@ psycopg2-binary
 python-dotenv
 plotly
 numpy
+jinja2
 
 
