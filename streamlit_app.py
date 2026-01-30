@@ -274,15 +274,10 @@ def show_metadata_page():
             help="Enter your organization or company name"
         )
 
-     with col2:
-        # Adjusts UTC server time to local date (approx. US Eastern Time)
+    with col2:
+        # Adjust UTC server time to local date (approx. US Eastern Time)
         from datetime import datetime, timedelta
         today_local = (datetime.utcnow() - timedelta(hours=5)).date()
-        
-        assessment_date = st.date_input(
-            "Assessment Date",
-            value=st.session_state.get("assessment_date", today_local)
-        )
         
         assessment_date = st.date_input(
             "Assessment Date",
