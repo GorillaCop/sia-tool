@@ -541,22 +541,6 @@ def show_results_page():
     st.markdown('---')
     st.header('Export Options')
     
-    col1, col2 = st.columns(2)
-    col1, col2 = st.columns(2)
-
-with col1:
-    if st.button("📄 Build Executive Brief (HTML)", use_container_width=True):
-        with st.spinner("Building your executive brief..."):
-
-            # Create the signal map figure (already used on the page)
-            fig = create_network_signal_map(analysis)
-
-            # Convert the figure to PNG (for embedding in the brief)
-            map_png_b64 = fig_to_png_base64(fig)
-
-            # Build the Executive Brief HTML
-st.header("Executive Brief")
-
 col1, col2 = st.columns(2)
 
 with col1:
