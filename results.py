@@ -10,6 +10,7 @@ from collections import Counter
 import json
 from pathlib import Path
 import base64
+from jinja2 import Template
 
 def scroll_to_top():
     """Injects JavaScript to scroll the main content area to the top."""
