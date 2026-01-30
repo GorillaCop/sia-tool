@@ -460,26 +460,32 @@ def show_results_page():
             return
 
         for lifeline_name, data in analysis.items():
-            status = (data.get("status") or "MIXED").upper()
-            desc = data.get("description", "")
+        status = (data.get("status") or "MIXED").upper()
+        desc = data.get("description", "")
 
-            icon = status_color.get(status, "⚪")
-            st.subheader(f"{icon} {lifeline_name} — {status}")
-            if desc:
-                st.write(desc)
+        icon = status_color.get(status, "⚪")
+        st.subheader(f"{icon} {lifeline_name} — {status}")
 
+        if desc:
+            st.write(desc)
 
     # Section 2: Signal Map Visualization
-    st.header('Signal Integrity Map') 
-    st.markdown("Node colors indicate status, and distance from center represents signal integrity.") 
+    st.header("Signal Integrity Map")
+    st.markdown(
+        "Node colors indicate status, and distance from center represents signal integrity."
+    )
 
-    viz_type = st.radio('Visualization Style', ['Radar Chart', 'Network Map'], horizontal=True) 
+    viz_type = st.radio(
+        "Visualization Style",
+        ["Radar Chart", "Network Map"],
+        horizontal=True
+    )
 
-    if viz_type == 'Radar Chart':
-        fig = create_signal_map(analysis) 
+    if viz_type == "Radar Chart":
+        fig = create_signal_map(analysis)
     else:
-        fig = create_network_signal_map(analysis) 
-    
+        fig = create_network_signal_map(analysis)
+
     st.plotly_chart(fig, use_container_width=True)
 
     # Section 3: Lifeline Integrity Grid
