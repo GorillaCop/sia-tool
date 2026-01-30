@@ -177,6 +177,10 @@ st.markdown("""
         background-color: #334155 !important;
     }
 </style>
+<script>
+    // Scroll to top when navigating between lifelines
+    window.parent.document.querySelector('.main').scrollTo(0, 0);
+</script>
 """, unsafe_allow_html=True)
 
 # Initialize session state
