@@ -460,14 +460,14 @@ def show_results_page():
             return
 
         for lifeline_name, data in analysis.items():
-        status = (data.get("status") or "MIXED").upper()
-        desc = data.get("description", "")
+            status = (data.get("status") or "MIXED").upper()
+            desc = data.get("description", "")
 
-        icon = status_color.get(status, "⚪")
-        st.subheader(f"{icon} {lifeline_name} — {status}")
+            icon = status_color.get(status, "⚪")
+            st.subheader(f"{icon} {lifeline_name} — {status}")
 
-        if desc:
-            st.write(desc)
+            if desc:
+                st.write(desc)
 
     # Section 2: Signal Map Visualization
     st.header("Signal Integrity Map")
