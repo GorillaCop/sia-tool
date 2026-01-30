@@ -434,13 +434,12 @@ def show_results_page():
         analysis = analyze_lifelines()  # <-- replace analyze_lifelines with your real function name
         st.session_state["analysis"] = analysis
 
-    """Display results with visualizations"""
-    # Force scroll to top upon loading results
-    scroll_to_top()
+        # Force scroll to top upon loading results
+        scroll_to_top()
 
-    st.title('Signal Integrity Assessment™')
-    st.markdown(f"**{st.session_state.org_name}** | Assessment Date: {st.session_state.assessment_date}")
-    st.markdown('---')
+        st.title('Signal Integrity Assessment™')
+        st.markdown(f"**{st.session_state.org_name}** | Assessment Date: {st.session_state.assessment_date}")
+        st.markdown('---')
 
     # Analyze responses
     analysis = analyze_responses() 
