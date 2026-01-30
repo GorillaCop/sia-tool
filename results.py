@@ -426,6 +426,14 @@ def build_executive_brief_html(org_name: str, assessment_date: str, analysis: di
 
 
 def show_results_page():
+        responses = st.session_state.get("responses", {})
+        if not responses:
+            st.error("No responses found. Please complete the assessment first.")
+            return
+
+        analysis = analyze_lifelines()  # <-- replace analyze_lifelines with your real function name
+        st.session_state["analysis"] = analysis
+
     """Display results with visualizations"""
     # Force scroll to top upon loading results
     scroll_to_top()
