@@ -540,7 +540,10 @@ def show_results_page():
     # Export options
     st.markdown('---')
     st.header('Export Options')
-    
+    analysis = st.session_state.get("analysis")
+    if analysis is None:
+    st.error("No analysis found. Please complete the assessment first.")
+    return
 col1, col2 = st.columns(2)
 
 with col1:
@@ -566,10 +569,12 @@ with col1:
             use_container_width=True
         )
 
-        st.info("Designed for board circulation. Open in Chrome → Print → Save as PDF.")
+st.info("Designed for board circulation. Open in Chrome → Print → Save as PDF.")
 
 with col2:
     st.caption("Confidential diagnostic • Prepared for internal leadership use")
+analysis = st.session_state.get("analysis")
+
 
     # Export data as JSON
     export_data = {
