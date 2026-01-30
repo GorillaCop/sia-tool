@@ -423,41 +423,39 @@ def build_executive_brief_html(org_name: str, assessment_date: str, analysis: di
         map_png_b64=map_png_b64,
         contact_line=CONTACT_LINE
     )
-
-
 def show_results_page():
-        responses = st.session_state.get("responses", {})
-        if not responses:
-            st.error("No responses found. Please complete the assessment first.")
-            return
-
-        # Force scroll to top upon loading results
-        scroll_to_top()
-
-        st.title('Signal Integrity Assessment™')
-        st.markdown(f"**{st.session_state.org_name}** | Assessment Date: {st.session_state.assessment_date}")
-        st.markdown('---')
-
-        # Analyze responses
-        analysis = analyze_responses() 
-        if not analysis:
-            st.error("Assessment analysis could not be generated. Please complete all questions.")
-            return
-
-        # Section 1: Executive Observations
-        st.header("Executive Observations")
-
-        status_color = {
-            "SOLID": "🟢",
-            "CONDITIONAL": "🟡",
-            "MIXED": "⚪",
-            "FRAGILE": "🔴",
-    }
-
-            # Safety: analysis must exist and be a dict
-    if not isinstance(analysis, dict) or not analysis:
-        st.error("No analysis found. Please complete the assessment first.")
+    responses = st.session_state.get("responses", {})
+    if not responses:
+        st.error("No responses found. Please complete the assessment first.")
         return
+
+    # Force scroll to top upon loading results
+    scroll_to_top()
+
+    st.title("Signal Integrity Assessment™")
+    st.markdown(
+        f"**{st.session_state.org_name}** | Assessment Date: {st.session_state.assessment_date}"
+    )
+    st.markdown("---")
+
+    # Analyze responses
+    analysis = analyze_responses()
+    if not isinstance(analysis, dict) or not analysis:
+        st.error("Assessment analysis could not be generated. Please complete all questions.")
+        return
+
+    # Store for later export / other pages
+    st.session_state["analysis"] = analysis
+
+    # Section 1: Executive Observations
+    st.header("Executive Observations")
+
+    status_color = {
+        "SOLID": "🟢",
+        "CONDITIONAL": "🟡",
+        "MIXED": "⚪",
+        "FRAGILE": "🔴",
+    }
 
     for lifeline_name, data in analysis.items():
         status = (data.get("status") or "MIXED").upper()
@@ -478,15 +476,7 @@ def show_results_page():
     viz_type = st.radio(
         "Visualization Style",
         ["Radar Chart", "Network Map"],
-        horizontal=True
-    )
-
-    if viz_type == "Radar Chart":
-        fig = create_signal_map(analysis)
-    else:
-        fig = create_network_signal_map(analysis)
-
-    st.plotly_chart(fig, use_container_width=True)
+        horizontal=True,
     )
 
     if viz_type == "Radar Chart":
@@ -497,138 +487,148 @@ def show_results_page():
     st.plotly_chart(fig, use_container_width=True)
 
     # Section 3: Lifeline Integrity Grid
-    st.header('Lifeline Integrity Grid')
+    st.header("Lifeline Integrity Grid")
     table_data = []
     for lifeline_name, data in analysis.items():
-        signals = data['signals'] 
-        signal_pattern = ', '.join([f"{sig}: {count}" for sig, count in signals.items()]) 
-        table_data.append({
-            'Lifeline': lifeline_name,
-            'Status': data['status'],
-            'Signal Pattern': signal_pattern
-        }) 
+        signals = data.get("signals", {})
+        signal_pattern = ", ".join([f"{sig}: {count}" for sig, count in signals.items()])
+        table_data.append(
+            {
+                "Lifeline": lifeline_name,
+                "Status": data.get("status", ""),
+                "Signal Pattern": signal_pattern,
+            }
+        )
     st.table(table_data)
 
     # Section 4: Key Distinctions
-    st.header('Key Distinctions')
-    st.info("""
-    **Signal Classifications Defined:**
-    * **Observed:** Direct, current evidence. 
-    * **Assumed:** Believed to be true but not recently confirmed. 
-    * **Historical:** Once verified but not tested under current conditions.
-    * **Compensated:** Stability depends on individual effort or workarounds.
-    """)
+    st.header("Key Distinctions")
+    st.info(
+        """
+**Signal Classifications Defined:**
+* **Observed:** Direct, current evidence.
+* **Assumed:** Believed to be true but not recently confirmed.
+* **Historical:** Once verified but not tested under current conditions.
+* **Compensated:** Stability depends on individual effort or workarounds.
+"""
+    )
 
     # Section 5: Reflection Prompts
-    st.header('Questions for Leadership Reflection') 
-    st.markdown("""
-    * Which of these lifelines would matter most under sustained pressure? 
-    * Where is operational continuity dependent on people rather than process? 
-    * What information should be verified before your next major decision? 
-    * Where might historical assumptions be vulnerable to current changes? 
-    """)
+    st.header("Questions for Leadership Reflection")
+    st.markdown(
+        """
+* Which of these lifelines would matter most under sustained pressure?
+* Where is operational continuity dependent on people rather than process?
+* What information should be verified before your next major decision?
+* Where might historical assumptions be vulnerable to current changes?
+"""
+    )
 
-    st.markdown('---')
+    st.markdown("---")
 
-    # Section 6: Restart Option
+    # Section 6: Restart Option (quick)
     if st.button("Start New Assessment", use_container_width=False):
-        for key in list(st.session_state.keys()): 
-            del st.session_state[key] 
-        st.rerun() 
-    
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
+
     # Closing Statement
-    st.info("""
-    **Note:** This assessment identifies where decision confidence is well supported by current evidence 
-    and where additional verification may be needed. It does not prescribe solutions or evaluate leadership capability.
-    
-    For shared organizational clarity, this assessment is often reviewed in a facilitated mirror session.
-    """)
-    
+    st.info(
+        """
+**Note:** This assessment identifies where decision confidence is well supported by current evidence
+and where additional verification may be needed. It does not prescribe solutions or evaluate leadership capability.
+
+For shared organizational clarity, this assessment is often reviewed in a facilitated mirror session.
+"""
+    )
+
     # Professional CTA Footer
-    st.markdown('---')
-    st.markdown("""
-    <div style='text-align: center; padding: 2rem; background-color: #f8fafc; border-radius: 8px; margin-top: 2rem;'>
-        <h3 style='color: #1e293b; margin-bottom: 1rem;'>Schedule a Mirror Session</h3>
-        <p style='color: #64748b; margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;'>
-            Gain shared organizational clarity by reviewing this assessment in a facilitated discussion 
-            with your leadership team.
-        </p>
-        <a href='mailto:contact@southwindplanning.com?subject=Mirror Session Request&body=I just completed the Signal Integrity Assessment and would like to schedule a mirror session.%0D%0A%0D%0AOrganization: {org_name}%0D%0AAssessment Date: {date}' 
-           style='display: inline-block; background-color: #1e293b; color: white; padding: 0.875rem 2rem; 
-                  text-decoration: none; border-radius: 6px; font-weight: 500; 
-                  transition: background-color 0.2s;'>
-            Schedule Mirror Session →
-        </a>
-        <p style='color: #94a3b8; font-size: 0.875rem; margin-top: 1.5rem;'>
-            <strong>Southwind Planning</strong> • Readiness Is Not a Plan. It's a Capability.
-        </p>
-    </div>
-    """.format(org_name=st.session_state.org_name, date=st.session_state.assessment_date), unsafe_allow_html=True)
-    
+    st.markdown("---")
+    st.markdown(
+        """
+<div style='text-align: center; padding: 2rem; background-color: #f8fafc; border-radius: 8px; margin-top: 2rem;'>
+  <h3 style='color: #1e293b; margin-bottom: 1rem;'>Schedule a Mirror Session</h3>
+  <p style='color: #64748b; margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;'>
+    Gain shared organizational clarity by reviewing this assessment in a facilitated discussion
+    with your leadership team.
+  </p>
+  <a href='mailto:contact@southwindplanning.com?subject=Mirror Session Request&body=I just completed the Signal Integrity Assessment and would like to schedule a mirror session.%0D%0A%0D%0AOrganization: {org_name}%0D%0AAssessment Date: {date}'
+     style='display: inline-block; background-color: #1e293b; color: white; padding: 0.875rem 2rem;
+            text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.2s;'>
+    Schedule Mirror Session →
+  </a>
+  <p style='color: #94a3b8; font-size: 0.875rem; margin-top: 1.5rem;'>
+    <strong>Southwind Planning</strong> • Readiness Is Not a Plan. It's a Capability.
+  </p>
+</div>
+""".format(
+            org_name=st.session_state.org_name,
+            date=st.session_state.assessment_date,
+        ),
+        unsafe_allow_html=True,
+    )
+
     # Export options
-    st.markdown('---')
-    st.header('Export Options')
+    st.markdown("---")
+    st.header("Export Options")
+    st.info("Designed for board circulation. Open in Chrome → Print → Save as PDF.")
 
     col1, col2 = st.columns(2)
 
+    # ----- Executive Brief (HTML) -----
     with col1:
+        st.caption("Generate a board-ready brief (HTML). Download and print to PDF.")
+
+        brief_html = None
         if st.button("📄 Build Executive Brief", use_container_width=True):
             with st.spinner("Building your executive brief..."):
-
                 fig = create_network_signal_map(analysis)
                 map_png_b64 = fig_to_png_base64(fig)
 
                 brief_html = build_executive_brief_html(
-                org_name=st.session_state.org_name,
-                assessment_date=str(st.session_state.assessment_date),
-                analysis=analysis,
-                map_png_b64=map_png_b64
+                    org_name=st.session_state.org_name,
+                    assessment_date=str(st.session_state.assessment_date),
+                    analysis=analysis,
+                    map_png_b64=map_png_b64,
+                )
+
+        if brief_html:
+            safe_org = st.session_state.org_name.replace(" ", "_")
+            st.download_button(
+                label="⬇️ Download Executive Brief (HTML)",
+                data=brief_html.encode("utf-8"),
+                file_name=f"Signal_Integrity_Brief_{safe_org}_{st.session_state.assessment_date}.html",
+                mime="text/html",
+                use_container_width=True,
             )
+        else:
+            st.caption("Click **Build Executive Brief** first, then the download button will appear.")
+
+    # ----- Data Export (JSON) -----
+    with col2:
+        st.caption("Confidential diagnostic • Prepared for internal leadership use")
+
+        export_data = {
+            "organization": st.session_state.org_name,
+            "assessment_date": str(st.session_state.assessment_date),
+            "analysis": {
+                k: {
+                    "status": v.get("status"),
+                    "description": v.get("description"),
+                    "signals": dict(v.get("signals", {})),
+                }
+                for k, v in analysis.items()
+            },
+        }
 
         safe_org = st.session_state.org_name.replace(" ", "_")
         st.download_button(
-            label="Download Executive Brief",
-            data=brief_html.encode("utf-8"),
-            file_name=f"Signal_Integrity_Brief_{safe_org}_{st.session_state.assessment_date}.html",
-            mime="text/html",
-            use_container_width=True
+            label="📥 Download Data (JSON)",
+            data=json.dumps(export_data, indent=2),
+            file_name=f"Signal_Integrity_Data_{safe_org}_{st.session_state.assessment_date}.json",
+            mime="application/json",
+            use_container_width=True,
         )
 
-st.info("Designed for board circulation. Open in Chrome → Print → Save as PDF.")
 
-with col2:
-    st.caption("Confidential diagnostic • Prepared for internal leadership use")
-analysis = st.session_state.get("analysis")
-
-
-    # Export data as JSON
-    export_data = {
-        'organization': st.session_state.org_name,
-        'assessment_date': str(st.session_state.assessment_date),
-        'analysis': {k: {
-            'status': v['status'],
-            'description': v['description'],
-            'signals': dict(v['signals'])
-        } for k, v in analysis.items()}
-    }
-
-    safe_org = st.session_state.org_name.replace(" ", "_")
-
-    st.download_button(
-        label="📥 Download Data (JSON)",
-        data=json.dumps(export_data, indent=2),
-        file_name=f"Signal_Integrity_Data_{safe_org}_{st.session_state.assessment_date}.json",
-        mime="application/json",
-        use_container_width=True
-    )
-
-
-    
-    # Restart option
-    st.markdown('---')
-    if st.button('← Start New Assessment', use_container_width=False):
-        # Clear session state
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.rerun()
 
