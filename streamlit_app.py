@@ -318,14 +318,11 @@ def show_metadata_page():
             st.error('Please enter an organization name to continue.')
 
 def scroll_to_top():
-    """Injects JavaScript to scroll the main content area to the top."""
+    """Force browser to scroll to top of the Streamlit main container."""
     components.html(
         """
         <script>
-            var mainSection = window.parent.document.querySelector('section.main');
-            if (mainSection) {
-                mainSection.scrollTo({ top: 0, behavior: 'auto' });
-            }
+            window.parent.document.querySelector('section.main').scrollTo(0, 0);
         </script>
         """,
         height=0,
