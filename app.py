@@ -1,121 +1,437 @@
 """
-Signal Integrity Assessment - Flask Backend
-Main application entry point
+Signal Integrity Assessment™
+Streamlit Application - Main Entry Point
 """
+import streamlit.components.v1 as components
+import streamlit as st
+from datetime import date
+import json
+from pathlib import Path
+def render_brand_header(title: str, subtitle: str | None = None):
+    """Quiet-luxury header: small logo top-left, title to the right."""
+    left, right = st.columns([1, 6], vertical_alignment="center")
 
-from flask import Flask, send_from_directory, jsonify, request
-from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
-import os
-from datetime import datetime
+    with left:
+        if LOGO_MONO_PATH.exists():
+            st.image(str(LOGO_MONO_PATH), width=95)
+        else:
+            st.markdown("")
 
-# Database setup
-class Base(DeclarativeBase):
-    pass
+    with right:
+        st.markdown(f"# {title}")
+        if subtitle:
+            st.markdown(f"*{subtitle}*")
 
-db = SQLAlchemy(model_class=Base)
+def render_footer(show_prepared_by: bool = False):
+    """Discreet footer on every screen."""
+    extra = f"<br><span style='font-size:9px;'>{FOOTER_SUBTEXT}</span>" if show_prepared_by else ""
+    st.markdown(
+        f"""
+        <style>
+          .sw-footer {{
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            padding: 8px 0;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 10px;
+            background: rgba(255,255,255,0.85);
+            border-top: 1px solid #e5e7eb;
+            z-index: 999;
+          }}
+        </style>
+        <div class="sw-footer">{FOOTER_TEXT}{extra}</div>
+        """,
+        unsafe_allow_html=True
+    )
 
-# Create Flask app
-app = Flask(__name__)
+LOGO_MONO_PATH = Path("assets/southwind_logo_mono_navy.png")
 
-# Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
-# Fix for Render/Heroku postgres:// URLs
-if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
-    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace('postgres://', 'postgresql://', 1)
+FOOTER_TEXT = "Southwind Planning • Readiness Is Not a Plan. It’s a Capability."
+FOOTER_SUBTEXT = "Prepared by Mike McCracken • 2026"
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+APP_VERSION = "2026-01-28b"
 
-# Initialize extensions
-db.init_app(app)
-CORS(app)
+st.set_page_config(
+    page_title="Signal Integrity Assessment™",
+    page_icon="🎯",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+# --- Session state initialization (must run before any page renders) ---
+if "page" not in st.session_state:
+    st.session_state.page = "metadata"
 
-# Models
-class Message(db.Model):
-    __tablename__ = 'messages'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'content': self.content,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+if "org_name" not in st.session_state:
+    st.session_state.org_name = ""
+
+if "assessment_date" not in st.session_state:
+    from datetime import date
+    st.session_state.assessment_date = date.today()
+
+if "current_lifeline" not in st.session_state:
+    st.session_state.current_lifeline = 0
+
+if "responses" not in st.session_state:
+    st.session_state.responses = {}
+
+# ✅ GLOBAL TAGLINE (safe, top-level, not inside any function)
+st.markdown(
+    "<p class='tagline'>Readiness Is Not a Plan. It's a Capability.</p>",
+    unsafe_allow_html=True
+)
+
+# Optional debug/version markers (temporary)
+st.sidebar.caption(f"Version: {APP_VERSION}")
+st.sidebar.error("MARKER: 2026-01-28b")
+
+# Custom CSS for professional styling
+st.markdown("""
+<style>
+    .main {
+        padding: 2rem;
+    }
+    h1 {
+        font-weight: 300;
+        letter-spacing: 2px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .tagline {
+        font-style: italic;
+        color: #475569;
+        margin-bottom: 1.5rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+
+# Custom CSS for professional styling
+st.markdown("""
+<style>
+    .main {
+        padding: 2rem;
+    }
+    h1 {
+        font-weight: 300;
+        letter-spacing: 2px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    h2 {
+        font-weight: 600;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+    .tagline {
+        font-size: 1.1rem;
+        color: #1e293b;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-style: italic;
+    }
+    .stButton > button {
+        background-color: #1e293b;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+    }
+    .stButton > button:hover {
+        background-color: #334155;
+    }
+    .lifeline-header {
+        background-color: #f8fafc;
+        padding: 1rem;
+        border-left: 4px solid #64748b;
+        margin-bottom: 1rem;
+    }
+    .question-container {
+        background-color: #ffffff;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+        border-radius: 4px;
+        animation: fadeIn 0.3s ease-in;
+    }
+    .progress-text {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
         }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    a[href*="mailto"]:hover {
+        background-color: #334155 !important;
+    }
+</style>
 
-# Create tables
-with app.app_context():
-    db.create_all()
-    
-    # Seed database if empty
-    if Message.query.count() == 0:
-        seed_messages = [
-            Message(content="Hello from the backend!"),
-            Message(content="This is a seed message.")
+""", unsafe_allow_html=True)
+
+# Initialize session state
+if 'page' not in st.session_state:
+    st.session_state.page = 'metadata'
+if 'responses' not in st.session_state:
+    st.session_state.responses = {}
+if 'current_lifeline' not in st.session_state:
+    st.session_state.current_lifeline = 0
+
+# Assessment questions structure
+LIFELINES = {
+    0: {
+        'name': 'Leadership Awareness',
+        'questions': [
+            'How do you currently know what is working and what is under strain across critical operations?',
+            'When priorities compete, how do you know which dependencies will fail first?',
+            'What would become visible only under sustained pressure or resource constraints?',
+            'How do leaders verify that operational assumptions are still valid?',
+            'What information do you rely on that has not been independently confirmed in the past 6 months?'
         ]
-        db.session.add_all(seed_messages)
-        db.session.commit()
-        print("Database seeded with initial messages")
+    },
+    1: {
+        'name': 'Operational Dependencies',
+        'questions': [
+            'What critical processes depend on specific individuals to function properly?',
+            'Which vendor or supplier relationships have not been stress-tested in the past 12 months?',
+            'What workarounds have become standard operating procedure?',
+            'What happens if your top three operational experts are unavailable for two weeks?',
+            'Which systems or processes lack documented backup procedures?'
+        ]
+    },
+    2: {
+        'name': 'Decision Clarity',
+        'questions': [
+            'When urgent decisions are needed, how do you verify you\'re working from current information?',
+            'What decisions are currently being delayed due to incomplete information or competing priorities?',
+            'Where do informal channels override formal decision-making processes?',
+            'How do you know when a decision is based on accurate versus assumed information?',
+            'What percentage of major decisions are made with verified data versus historical assumptions?'
+        ]
+    },
+    3: {
+        'name': 'Resource Resilience',
+        'questions': [
+            'Which resources (people, systems, suppliers) operate with no viable backup or alternative?',
+            'What capabilities exist primarily because of individual expertise rather than documented process?',
+            'Where is organizational capacity being sustained through overtime, heroics, or goodwill?',
+            'What critical resources are operating at or above sustainable capacity?',
+            'Which resource constraints are currently being managed through workarounds?'
+        ]
+    },
+    4: {
+        'name': 'Information Flow',
+        'questions': [
+            'How do you know when critical information is not reaching decision-makers?',
+            'What signals of emerging problems currently go unnoticed or unreported?',
+            'Where does "everything is fine" actually mean "someone is handling it quietly"?',
+            'How is bad news communicated upward in your organization?',
+            'What information do you wish you had real-time visibility into?'
+        ]
+    }
+}
 
-# API Routes
-@app.route('/api/messages', methods=['GET'])
-def get_messages():
-    """Get all messages"""
-    messages = Message.query.order_by(Message.created_at.desc()).all()
-    return jsonify([msg.to_dict() for msg in messages])
+SIGNAL_TYPES = [
+    'Observed - Direct, current evidence',
+    'Assumed - Believed but not verified',
+    'Historical - Once true, not recently tested',
+    'Compensated - Held together by people/workarounds'
+]
 
-@app.route('/api/messages', methods=['POST'])
-def create_message():
-    """Create a new message"""
-    try:
-        data = request.get_json()
+
+def show_metadata_page():
+    """Metadata collection page"""
+
+    render_brand_header(
+        "Signal Integrity Assessment™",
+        "A structured executive diagnostic on decision information reliability."
+    )
+    render_footer(show_prepared_by=False)
+
+    st.markdown(
+        "*A structured executive diagnostic that reveals where leadership decisions are supported by verified information—and where they depend on assumptions, workarounds, or individual effort.*"
+    )
+
+    st.markdown("---")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        org_name = st.text_input(
+            "Organization Name",
+            value=st.session_state.get("org_name", ""),
+            help="Enter your organization or company name"
+        )
+
+    with col2:
+        # Adjust UTC server time to local date (approx. US Eastern Time)
+        from datetime import datetime, timedelta
+        today_local = (datetime.utcnow() - timedelta(hours=5)).date()
         
-        if not data or 'content' not in data:
-            return jsonify({'message': 'Content is required'}), 400
+        assessment_date = st.date_input(
+            "Assessment Date",
+            value=st.session_state.get("assessment_date", today_local)
+        )
+    
+    st.session_state["org_name"] = org_name
+    st.session_state["assessment_date"] = assessment_date
+
+    
+    st.markdown('---')
+    
+    st.markdown("""
+    ### What to Expect
+    
+    This assessment examines 5 critical business lifelines:
+    - **Leadership Awareness** - Quality of operational visibility
+    - **Operational Dependencies** - Key process and resource dependencies
+    - **Decision Clarity** - Information quality for decisions
+    - **Resource Resilience** - Backup capacity and sustainability
+    - **Information Flow** - Communication and signal detection
+    
+    **Time required:** Approximately 15 minutes
+    
+    **Output:** A single-page executive artifact showing where your decisions rest on verified information versus assumptions.
+    """)
+    
+    st.markdown('---')
+    
+    if st.button('Begin Assessment', use_container_width=True):
+        if org_name.strip():
+            st.session_state.org_name = org_name
+            st.session_state.assessment_date = assessment_date
+            st.session_state.page = 'assessment'
+            st.session_state.current_lifeline = 0
+            st.session_state.force_scroll_top = True
+            st.rerun()
+        else:
+            st.error('Please enter an organization name to continue.')
+
+def scroll_to_top():
+    """Force browser to scroll to top with a delay to override button focus."""
+    components.html(
+        """
+        <script>
+            setTimeout(function() {
+                var mainSection = window.parent.document.querySelector('section.main');
+                if (mainSection) {
+                    mainSection.scrollTo({ top: 0, behavior: 'auto' });
+                }
+            }, 50); 
+        </script>
+        """,
+        height=0,
+    )
+
+def show_assessment_page():
+    lifeline_idx = st.session_state.get("current_lifeline", 0)
+    
+    # Keep index in range
+    if lifeline_idx < 0:
+        lifeline_idx = 0
+        st.session_state.current_lifeline = 0
+    if lifeline_idx >= len(LIFELINES):
+        lifeline_idx = len(LIFELINES) - 1
+        st.session_state.current_lifeline = lifeline_idx
+
+    # Header section
+    render_brand_header("Signal Integrity Assessment™", "A structured executive diagnostic on decision information reliability.")
+    st.markdown(f"**Organization:** {st.session_state.org_name} | **Date:** {st.session_state.assessment_date}")
+
+    # Progress indicator
+    progress = (lifeline_idx + 1) / len(LIFELINES)
+    st.progress(progress)
+    st.markdown(f"**Business Lifeline {lifeline_idx + 1} of {len(LIFELINES)}** ({int(progress * 100)}% Complete)")
+    st.markdown("---")
+
+    # Current Lifeline content
+    lifeline = LIFELINES[lifeline_idx]
+    st.subheader(lifeline.get('name', 'Business Lifeline'))
+    
+    questions = lifeline.get("questions", [])
+
+    # Render Questions
+    for q_idx, question in enumerate(questions):
+        key_base = f"{lifeline_idx}_{q_idx}"
         
-        content = data['content']
-        if not content or not content.strip():
-            return jsonify({'message': 'Content cannot be empty'}), 400
-        
-        message = Message(content=content)
-        db.session.add(message)
-        db.session.commit()
-        
-        return jsonify(message.to_dict()), 201
-        
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error creating message: {str(e)}")
-        return jsonify({'message': 'Internal Server Error'}), 500
+        with st.container():
+            st.markdown(f"**Question {q_idx + 1} of {len(questions)}**")
+            st.markdown(f"*{question}*")
+            
+            # Text area for response
+            response = st.text_area(
+                "Your Response",
+                value=st.session_state.responses.get(f"{key_base}_response", ""),
+                key=f"{key_base}_response_input",
+                height=110
+            )
+            
+            # Selectbox for signal classification
+            signal_type = st.selectbox(
+                "Signal Classification",
+                options=SIGNAL_TYPES,
+                index=SIGNAL_TYPES.index(
+                    st.session_state.responses.get(f"{key_base}_signal", SIGNAL_TYPES[0])
+                ),
+                key=f"{key_base}_signal_input"
+            )
+            
+            # Save to session state
+            st.session_state.responses[f"{key_base}_response"] = response
+            st.session_state.responses[f"{key_base}_signal"] = signal_type
+            st.markdown("---")
 
-# Health check endpoint
-@app.route("/api/health", methods=["GET"])
-def health_check():
-    return "OK", 200
+# Navigation buttons
+    col1, col2, col3 = st.columns([1, 1, 1])
+    
+    with col1:
+        if lifeline_idx > 0:
+            if st.button("- Previous Lifeline", use_container_width=True):
+                st.session_state.current_lifeline -= 1
+                scroll_to_top() # Added this
+                st.rerun()
+
+    with col2:
+        if st.button("Save Progress", use_container_width=True):
+            st.success("Progress saved!")
+
+    with col3:
+        if lifeline_idx < len(LIFELINES) - 1:
+            if st.button("Next Lifeline", use_container_width=True):
+                st.session_state.current_lifeline += 1
+                scroll_to_top() # Added this
+                st.rerun()
+        else:
+            if st.button("Generate Assessment →", use_container_width=True, type="primary"):
+                st.session_state.page = "results"
+                scroll_to_top() # Added this
+                st.rerun()
+
+    render_footer(show_prepared_by=True)
+
+def main():
+    """Main application router"""
+    if st.session_state.page == 'metadata':
+        show_metadata_page()
+    elif st.session_state.page == 'assessment':
+        show_assessment_page()
+    elif st.session_state.page == 'results':
+        # Import and show results page
+        from results import show_results_page
+        show_results_page()
 
 
-# Serve React app
-@app.route("/", methods=["GET"])
-def home():
-    return "Signal Integrity Assessment API is running.", 200
-
-# Error handlers
-@app.errorhandler(404)
-def not_found(e):
-    return jsonify({'message': 'Not found'}), 404
-
-@app.errorhandler(500)
-def internal_error(e):
-    """Handle 500 errors"""
-    db.session.rollback()
-    return jsonify({'message': 'Internal Server Error'}), 500
-
-# Run the app
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    debug = os.environ.get('FLASK_ENV') == 'development'
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    main()
+
