@@ -274,7 +274,7 @@ def show_metadata_page():
             help="Enter your organization or company name"
         )
 
- with col2:
+     with col2:
         # Adjusts UTC server time to local date (approx. US Eastern Time)
         from datetime import datetime, timedelta
         today_local = (datetime.utcnow() - timedelta(hours=5)).date()
