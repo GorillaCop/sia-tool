@@ -435,10 +435,10 @@ def show_results_page():
     st.markdown('---')
 
     # Analyze responses
-    analysis = analyze_responses() [cite: 811, 812]
+    analysis = analyze_responses() 
 
     # Section 1: Executive Observations
-    st.header('Executive Observations') [cite: 813, 814]
+    st.header('Executive Observations') 
     
     status_color = {
         'SOLID': '🟢',
@@ -449,64 +449,64 @@ def show_results_page():
 
     for lifeline_name, data in analysis.items():
         icon = status_color.get(data['status'], '⚪')
-        st.markdown(f"### {icon} {lifeline_name}") [cite: 824]
-        st.markdown(f"*Status: {data['status']}*") [cite: 825]
-        st.markdown(f"{data['description']}") [cite: 826]
+        st.markdown(f"### {icon} {lifeline_name}") 
+        st.markdown(f"*Status: {data['status']}*")
+        st.markdown(f"{data['description']}") 
     
     st.markdown('---')
 
     # Section 2: Signal Map Visualization
-    st.header('Signal Integrity Map') [cite: 830]
-    st.markdown("Node colors indicate status, and distance from center represents signal integrity.") [cite: 834, 835]
+    st.header('Signal Integrity Map') 
+    st.markdown("Node colors indicate status, and distance from center represents signal integrity.") 
 
-    viz_type = st.radio('Visualization Style', ['Radar Chart', 'Network Map'], horizontal=True) [cite: 838, 840, 841]
+    viz_type = st.radio('Visualization Style', ['Radar Chart', 'Network Map'], horizontal=True) 
 
     if viz_type == 'Radar Chart':
-        fig = create_signal_map(analysis) [cite: 842, 844]
+        fig = create_signal_map(analysis) 
     else:
-        fig = create_network_signal_map(analysis) [cite: 843, 845]
+        fig = create_network_signal_map(analysis) 
     
-    st.plotly_chart(fig, use_container_width=True) [cite: 846]
+    st.plotly_chart(fig, use_container_width=True)
 
     # Section 3: Lifeline Integrity Grid
-    st.header('Lifeline Integrity Grid') [cite: 847, 848]
+    st.header('Lifeline Integrity Grid')
     table_data = []
     for lifeline_name, data in analysis.items():
-        signals = data['signals'] [cite: 851, 852]
-        signal_pattern = ', '.join([f"{sig}: {count}" for sig, count in signals.items()]) [cite: 853, 854]
+        signals = data['signals'] 
+        signal_pattern = ', '.join([f"{sig}: {count}" for sig, count in signals.items()]) 
         table_data.append({
             'Lifeline': lifeline_name,
             'Status': data['status'],
             'Signal Pattern': signal_pattern
-        }) [cite: 855, 857, 858, 859]
-    st.table(table_data) [cite: 860]
+        }) 
+    st.table(table_data)
 
     # Section 4: Key Distinctions
-    st.header('Key Distinctions') [cite: 861, 862]
+    st.header('Key Distinctions')
     st.info("""
     **Signal Classifications Defined:**
-    * **Observed:** Direct, current evidence. [cite: 865]
-    * **Assumed:** Believed to be true but not recently confirmed. [cite: 866]
-    * **Historical:** Once verified but not tested under current conditions. [cite: 867]
-    * **Compensated:** Stability depends on individual effort or workarounds. [cite: 868, 869]
+    * **Observed:** Direct, current evidence. 
+    * **Assumed:** Believed to be true but not recently confirmed. 
+    * **Historical:** Once verified but not tested under current conditions.
+    * **Compensated:** Stability depends on individual effort or workarounds.
     """)
 
     # Section 5: Reflection Prompts
-    st.header('Questions for Leadership Reflection') [cite: 870, 871]
+    st.header('Questions for Leadership Reflection') 
     st.markdown("""
-    * Which of these lifelines would matter most under sustained pressure? [cite: 873, 874]
-    * Where is operational continuity dependent on people rather than process? [cite: 875]
-    * What information should be verified before your next major decision? [cite: 876]
-    * Where might historical assumptions be vulnerable to current changes? [cite: 877]
+    * Which of these lifelines would matter most under sustained pressure? 
+    * Where is operational continuity dependent on people rather than process? 
+    * What information should be verified before your next major decision? 
+    * Where might historical assumptions be vulnerable to current changes? 
     """)
 
     st.markdown('---')
 
     # Section 6: Restart Option
     if st.button("Start New Assessment", use_container_width=False):
-        for key in list(st.session_state.keys()): [cite: 978]
-            del st.session_state[key] [cite: 979]
-        st.rerun() [cite: 980]
+        for key in list(st.session_state.keys()): 
+            del st.session_state[key] 
+        st.rerun() 
     
     # Closing Statement
     st.info("""
