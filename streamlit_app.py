@@ -356,10 +356,12 @@ def show_assessment_page():
         lifeline_idx = len(LIFELINES) - 1
         st.session_state.current_lifeline = lifeline_idx
 
-    # Force scroll-to-top AFTER rerun (on new render)
-    if st.session_state.get("force_scroll_top", False):
-        scroll_to_top()
-        st.session_state.force_scroll_top = False
+    # Scroll to top when lifeline changes
+    st.markdown("""
+        <script>
+            window.parent.document.querySelector('section.main').scrollTo(0, 0);
+        </script>
+    """, unsafe_allow_html=True)
 
     lifeline = LIFELINES[lifeline_idx]
     # Header
