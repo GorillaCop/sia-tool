@@ -382,20 +382,20 @@ def show_assessment_page():
     questions = lifeline.get("questions", [])
 
     for q_idx, question in enumerate(questions):
-    key_base = f"{lifeline_idx}_{q_idx}"
+        key_base = f"{lifeline_idx}_{q_idx}"
 
-    st.markdown("---")
-    st.markdown(f"**Question {q_idx + 1} of {len(questions)}**")
-    st.markdown(f"*{question}*")
+        st.markdown("---")
+        st.markdown(f"**Question {q_idx + 1} of {len(questions)}**")
+        st.markdown(f"*{question}*")
 
-    response = st.text_area(
+        response = st.text_area(
         "Your Response",
         value=st.session_state.responses.get(f"{key_base}_response", ""),
         key=f"{key_base}_response_input",
         height=110,
     )
 
-    signal_type = st.selectbox(
+        signal_type = st.selectbox(
         "Signal Classification",
         options=SIGNAL_TYPES,
         index=SIGNAL_TYPES.index(
@@ -404,9 +404,9 @@ def show_assessment_page():
         key=f"{key_base}_signal_input",
     )
 
-    # Save to session state
-    st.session_state.responses[f"{key_base}_response"] = response
-    st.session_state.responses[f"{key_base}_signal"] = signal_type
+        # Save to session state
+        st.session_state.responses[f"{key_base}_response"] = response
+        st.session_state.responses[f"{key_base}_signal"] = signal_type
 
     
     st.markdown("---")
