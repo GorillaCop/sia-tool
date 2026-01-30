@@ -431,9 +431,6 @@ def show_results_page():
             st.error("No responses found. Please complete the assessment first.")
             return
 
-        analysis = analyze_lifelines()  # <-- replace analyze_lifelines with your real function name
-        st.session_state["analysis"] = analysis
-
         # Force scroll to top upon loading results
         scroll_to_top()
 
@@ -441,17 +438,20 @@ def show_results_page():
         st.markdown(f"**{st.session_state.org_name}** | Assessment Date: {st.session_state.assessment_date}")
         st.markdown('---')
 
-    # Analyze responses
-    analysis = analyze_responses() 
+        # Analyze responses
+        analysis = analyze_responses() 
+        if not analysis:
+            st.error("Assessment analysis could not be generated. Please complete all questions.")
+            return
 
-    # Section 1: Executive Observations
-    st.header('Executive Observations') 
+        # Section 1: Executive Observations
+        st.header('Executive Observations') 
     
-    status_color = {
-        'SOLID': '🟢',
-        'CONDITIONAL': '🟡',
-        'MIXED': '⚪',
-        'FRAGILE': '🔴'
+        status_color = {
+            'SOLID': '🟢',
+            'CONDITIONAL': '🟡',
+            'MIXED': '⚪',
+            'FRAGILE': '🔴'
     } 
 
     for lifeline_name, data in analysis.items():
