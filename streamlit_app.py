@@ -425,12 +425,12 @@ def show_assessment_page():
         if st.button("Save Progress", use_container_width=True):
             st.success("Progress saved!")
 
-    with col3:
-        if lifeline_idx < len(LIFELINES) - 1:
-            if st.button("Next Lifeline →", use_container_width=True):
-                st.session_state.current_lifeline += 1
-                st.session_state.force_scroll_top = True
-                st.rerun()
+with col3:
+    if lifeline_idx < len(LIFELINES) - 1:
+        if st.button("Next Lifeline →", use_container_width=True):
+            st.session_state.current_lifeline += 1
+            st.session_state.force_scroll_top = True
+            st.rerun()
     else:
         if st.button("Generate Assessment →", use_container_width=True, type="primary"):
             st.session_state.page = "results"
