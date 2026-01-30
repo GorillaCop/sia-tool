@@ -445,22 +445,29 @@ def show_results_page():
             return
 
         # Section 1: Executive Observations
-        st.header('Executive Observations') 
-    
-        status_color = {
-            'SOLID': '🟢',
-            'CONDITIONAL': '🟡',
-            'MIXED': '⚪',
-            'FRAGILE': '🔴'
-    } 
+        st.header("Executive Observations")
 
-    for lifeline_name, data in analysis.items():
-        icon = status_color.get(data['status'], '⚪')
-        st.markdown(f"### {icon} {lifeline_name}") 
-        st.markdown(f"*Status: {data['status']}*")
-        st.markdown(f"{data['description']}") 
-    
-    st.markdown('---')
+        status_color = {
+            "SOLID": "🟢",
+            "CONDITIONAL": "🟡",
+            "MIXED": "⚪",
+            "FRAGILE": "🔴",
+    }
+
+        # Safety: analysis must exist and be a dict
+        if not isinstance(analysis, dict) or not analysis:
+            st.error("No analysis found. Please complete the assessment first.")
+            return
+
+        for lifeline_name, data in analysis.items():
+            status = (data.get("status") or "MIXED").upper()
+            desc = data.get("description", "")
+
+            icon = status_color.get(status, "⚪")
+            st.subheader(f"{icon} {lifeline_name} — {status}")
+            if desc:
+                st.write(desc)
+
 
     # Section 2: Signal Map Visualization
     st.header('Signal Integrity Map') 
