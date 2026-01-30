@@ -375,9 +375,13 @@ def show_assessment_page():
     st.subheader(f"🎯 {lifeline.get('name', 'Business Lifeline')}")
 
     # Questions
-questions = lifeline.get("questions", [])
+    lifeline_idx = st.session_state.get("current_lifeline", 0)
+    lifeline = LIFELINES[lifeline_idx]
+    questions = lifeline.get("questions", [])
 
-for q_idx, question in enumerate(questions):
+    questions = lifeline.get("questions", [])
+
+    for q_idx, question in enumerate(questions):
     key_base = f"{lifeline_idx}_{q_idx}"
 
     st.markdown("---")
