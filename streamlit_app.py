@@ -430,11 +430,11 @@ def show_assessment_page():
                 st.session_state.current_lifeline += 1
                 st.session_state.force_scroll_top = True
                 st.rerun()
-    else:
-        if st.button("Generate Assessment →", use_container_width=True, type="primary"):
-            st.session_state.page = "results"
-            st.session_state.force_scroll_top = True
-            st.rerun()
+        else:
+            if st.button("Generate Assessment →", use_container_width=True, type="primary"):
+                st.session_state.page = "results"
+                st.session_state.force_scroll_top = True
+                st.rerun()
 
 
 def main():
