@@ -1,9 +1,0 @@
-streamlit
-sqlalchemy
-psycopg2-binary
-python-dotenv
-streamlit
-plotly
-numpy
-
-
