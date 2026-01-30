@@ -318,28 +318,14 @@ def show_metadata_page():
             st.error('Please enter an organization name to continue.')
 
 def scroll_to_top():
+    """Injects JavaScript to scroll the main content area to the top."""
     components.html(
         """
         <script>
-          // Try a few targets Streamlit uses, then fall back to window
-          const targets = [
-            window,
-            document.documentElement,
-            document.body,
-            window.parent,
-            window.parent?.document?.documentElement,
-            window.parent?.document?.body,
-            window.parent?.document?.querySelector('section.main'),
-            window.parent?.document?.querySelector('[data-testid="stAppViewContainer"]'),
-            window.parent?.document?.querySelector('[data-testid="stApp"]'),
-          ].filter(Boolean);
-
-          targets.forEach(t => {
-            try {
-              if (t.scrollTo) t.scrollTo(0, 0);
-              if (t.scrollTop !== undefined) t.scrollTop = 0;
-            } catch(e) {}
-          });
+            var mainSection = window.parent.document.querySelector('section.main');
+            if (mainSection) {
+                mainSection.scrollTo({ top: 0, behavior: 'auto' });
+            }
         </script>
         """,
         height=0,
@@ -347,8 +333,8 @@ def scroll_to_top():
 
 def show_assessment_page():
     lifeline_idx = st.session_state.get("current_lifeline", 0)
-
-    # keep index in range
+    
+    # Keep index in range
     if lifeline_idx < 0:
         lifeline_idx = 0
         st.session_state.current_lifeline = 0
@@ -356,75 +342,62 @@ def show_assessment_page():
         lifeline_idx = len(LIFELINES) - 1
         st.session_state.current_lifeline = lifeline_idx
 
-    # Scroll to top when lifeline changes
-    st.markdown("""
-        <script>
-            window.parent.document.querySelector('section.main').scrollTo(0, 0);
-        </script>
-    """, unsafe_allow_html=True)
-
-    lifeline = LIFELINES[lifeline_idx]
-    # Header
-    st.title("Signal Integrity Assessment™")
-    st.markdown(f"**{st.session_state.org_name}** • {st.session_state.assessment_date}")
+    # Header section
+    render_brand_header("Signal Integrity Assessment™", "A structured executive diagnostic on decision information reliability.")
+    st.markdown(f"**Organization:** {st.session_state.org_name} | **Date:** {st.session_state.assessment_date}")
 
     # Progress indicator
     progress = (lifeline_idx + 1) / len(LIFELINES)
     st.progress(progress)
-    st.markdown(
-    f"Business Lifeline {lifeline_idx + 1} of {len(LIFELINES)} • {int(progress * 100)}% Complete"
-    )
-
+    st.markdown(f"**Business Lifeline {lifeline_idx + 1} of {len(LIFELINES)}** ({int(progress * 100)}% Complete)")
     st.markdown("---")
 
-    # Lifeline header
-    st.subheader(f"🎯 {lifeline.get('name', 'Business Lifeline')}")
-
-    # Questions
-    lifeline_idx = st.session_state.get("current_lifeline", 0)
+    # Current Lifeline content
     lifeline = LIFELINES[lifeline_idx]
+    st.subheader(lifeline.get('name', 'Business Lifeline'))
+    
     questions = lifeline.get("questions", [])
 
-    questions = lifeline.get("questions", [])
-
+    # Render Questions
     for q_idx, question in enumerate(questions):
         key_base = f"{lifeline_idx}_{q_idx}"
+        
+        with st.container():
+            st.markdown(f"**Question {q_idx + 1} of {len(questions)}**")
+            st.markdown(f"*{question}*")
+            
+            # Text area for response
+            response = st.text_area(
+                "Your Response",
+                value=st.session_state.responses.get(f"{key_base}_response", ""),
+                key=f"{key_base}_response_input",
+                height=110
+            )
+            
+            # Selectbox for signal classification
+            signal_type = st.selectbox(
+                "Signal Classification",
+                options=SIGNAL_TYPES,
+                index=SIGNAL_TYPES.index(
+                    st.session_state.responses.get(f"{key_base}_signal", SIGNAL_TYPES[0])
+                ),
+                key=f"{key_base}_signal_input"
+            )
+            
+            # Save to session state
+            st.session_state.responses[f"{key_base}_response"] = response
+            st.session_state.responses[f"{key_base}_signal"] = signal_type
+            st.markdown("---")
 
-        st.markdown("---")
-        st.markdown(f"**Question {q_idx + 1} of {len(questions)}**")
-        st.markdown(f"*{question}*")
-
-        response = st.text_area(
-        "Your Response",
-        value=st.session_state.responses.get(f"{key_base}_response", ""),
-        key=f"{key_base}_response_input",
-        height=110,
-    )
-
-        signal_type = st.selectbox(
-        "Signal Classification",
-        options=SIGNAL_TYPES,
-        index=SIGNAL_TYPES.index(
-            st.session_state.responses.get(f"{key_base}_signal", SIGNAL_TYPES[0])
-        ),
-        key=f"{key_base}_signal_input",
-    )
-
-        # Save to session state
-        st.session_state.responses[f"{key_base}_response"] = response
-        st.session_state.responses[f"{key_base}_signal"] = signal_type
-
-    
-    st.markdown("---")
-
-     # Navigation buttons
+    # Navigation buttons
     col1, col2, col3 = st.columns([1, 1, 1])
-
+    
     with col1:
-        if st.button("← Previous Lifeline", use_container_width=True):
-            st.session_state.current_lifeline -= 1
-            st.session_state.force_scroll_top = True
-            st.rerun()
+        if lifeline_idx > 0:
+            if st.button("← Previous Lifeline", use_container_width=True):
+                st.session_state.current_lifeline -= 1
+                scroll_to_top()
+                st.rerun()
 
     with col2:
         if st.button("Save Progress", use_container_width=True):
@@ -434,14 +407,15 @@ def show_assessment_page():
         if lifeline_idx < len(LIFELINES) - 1:
             if st.button("Next Lifeline →", use_container_width=True):
                 st.session_state.current_lifeline += 1
-                st.session_state.force_scroll_top = True
+                scroll_to_top()
                 st.rerun()
         else:
             if st.button("Generate Assessment →", use_container_width=True, type="primary"):
                 st.session_state.page = "results"
-                st.session_state.force_scroll_top = True
+                scroll_to_top()
                 st.rerun()
 
+    render_footer(show_prepared_by=True)
 
 def main():
     """Main application router"""
