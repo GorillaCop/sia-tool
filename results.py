@@ -4,13 +4,27 @@ Results Page with Signal Map Visualization
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import plotly.graph_objects as go
 from collections import Counter
 import json
 from pathlib import Path
 import base64
 
-
+def scroll_to_top():
+    """Injects JavaScript to scroll the main content area to the top."""
+    components.html(
+        """
+        <script>
+            var mainSection = window.parent.document.querySelector('section.main');
+            if (mainSection) {
+                mainSection.scrollTo({ top: 0, behavior: 'auto' });
+            }
+        </script>
+        """,
+        height=0,
+    )
+    
 LOGO_COLOR_PATH = Path("assets/southwind_logo_color_tuned.png")
 TAGLINE = "Readiness Is Not a Plan. It’s a Capability."
 CONTACT_LINE = "Southwind Planning • mike@southwindplanning.com • " + TAGLINE
@@ -413,99 +427,86 @@ def build_executive_brief_html(org_name: str, assessment_date: str, analysis: di
 
 def show_results_page():
     """Display results with visualizations"""
+    # Force scroll to top upon loading results
+    scroll_to_top()
+
     st.title('Signal Integrity Assessment™')
-    st.markdown(f"**{st.session_state.org_name}** • Assessment Date: {st.session_state.assessment_date}")
+    st.markdown(f"**{st.session_state.org_name}** | Assessment Date: {st.session_state.assessment_date}")
+    st.markdown('---')
+
+    # Analyze responses
+    analysis = analyze_responses() [cite: 811, 812]
+
+    # Section 1: Executive Observations
+    st.header('Executive Observations') [cite: 813, 814]
+    
+    status_color = {
+        'SOLID': '🟢',
+        'CONDITIONAL': '🟡',
+        'MIXED': '⚪',
+        'FRAGILE': '🔴'
+    } [cite: 816, 817, 821]
+
+    for lifeline_name, data in analysis.items():
+        icon = status_color.get(data['status'], '⚪')
+        st.markdown(f"### {icon} {lifeline_name}") [cite: 824]
+        st.markdown(f"*Status: {data['status']}*") [cite: 825]
+        st.markdown(f"{data['description']}") [cite: 826]
     
     st.markdown('---')
-    
-    # Analyze responses
-    analysis = analyze_responses()
-    
-    # Section 1: Executive Observations
-    st.header('Executive Observations')
-    
-    for lifeline_name, data in analysis.items():
-        status_color = {
-            'SOLID': '🟢',
-            'CONDITIONAL': '🟡',
-            'MIXED': '⚪',
-            'FRAGILE': '🔴'
-        }
-        
-        st.markdown(f"""
-        **{status_color[data['status']]} {lifeline_name}**  
-        *Status: {data['status']}*  
-        {data['description']}
-        """)
-        st.markdown('---')
-    
+
     # Section 2: Signal Map Visualization
-    st.header('Signal Integrity Map')
-    
-    st.markdown("""
-    This visualization shows the relative strength of each business lifeline. 
-    Node colors indicate status, and the distance from center represents signal integrity.
-    """)
-    
-    # Choose visualization style
-    viz_type = st.radio(
-        'Visualization Style',
-        ['Radar Chart', 'Network Map'],
-        horizontal=True
-    )
-    
+    st.header('Signal Integrity Map') [cite: 830]
+    st.markdown("Node colors indicate status, and distance from center represents signal integrity.") [cite: 834, 835]
+
+    viz_type = st.radio('Visualization Style', ['Radar Chart', 'Network Map'], horizontal=True) [cite: 838, 840, 841]
+
     if viz_type == 'Radar Chart':
-        fig = create_signal_map(analysis)
+        fig = create_signal_map(analysis) [cite: 842, 844]
     else:
-        fig = create_network_signal_map(analysis)
+        fig = create_network_signal_map(analysis) [cite: 843, 845]
     
-    st.plotly_chart(fig, use_container_width=True)
-    
+    st.plotly_chart(fig, use_container_width=True) [cite: 846]
+
     # Section 3: Lifeline Integrity Grid
-    st.header('Lifeline Integrity Grid')
-    
-    # Create table data
+    st.header('Lifeline Integrity Grid') [cite: 847, 848]
     table_data = []
     for lifeline_name, data in analysis.items():
-        signals = data['signals']
-        signal_pattern = ', '.join([f"{sig}: {count}" for sig, count in signals.items()])
+        signals = data['signals'] [cite: 851, 852]
+        signal_pattern = ', '.join([f"{sig}: {count}" for sig, count in signals.items()]) [cite: 853, 854]
         table_data.append({
             'Lifeline': lifeline_name,
             'Status': data['status'],
             'Signal Pattern': signal_pattern
-        })
-    
-    st.table(table_data)
-    
+        }) [cite: 855, 857, 858, 859]
+    st.table(table_data) [cite: 860]
+
     # Section 4: Key Distinctions
-    st.header('Key Distinctions')
-    
-    st.markdown("""
+    st.header('Key Distinctions') [cite: 861, 862]
+    st.info("""
     **Signal Classifications Defined:**
-    
-    - **Observed:** Direct, current evidence. Leaders can point to specific, recent verification.
-    
-    - **Assumed:** Believed to be true but not recently confirmed. Often legacy knowledge.
-    
-    - **Historical:** Once verified but not tested under current conditions. May no longer hold.
-    
-    - **Compensated:** Stability depends on individual effort, workarounds, or heroics rather than documented process.
+    * **Observed:** Direct, current evidence. [cite: 865]
+    * **Assumed:** Believed to be true but not recently confirmed. [cite: 866]
+    * **Historical:** Once verified but not tested under current conditions. [cite: 867]
+    * **Compensated:** Stability depends on individual effort or workarounds. [cite: 868, 869]
     """)
-    
+
     # Section 5: Reflection Prompts
-    st.header('Questions for Leadership Reflection')
-    
+    st.header('Questions for Leadership Reflection') [cite: 870, 871]
     st.markdown("""
-    - Which of these lifelines would matter most under sustained pressure or resource constraint?
-    
-    - Where is operational continuity currently dependent on specific individuals rather than documented process?
-    
-    - What information would you want independently verified before your next major decision?
-    
-    - Where might historical assumptions be vulnerable to current market or operational changes?
+    * Which of these lifelines would matter most under sustained pressure? [cite: 873, 874]
+    * Where is operational continuity dependent on people rather than process? [cite: 875]
+    * What information should be verified before your next major decision? [cite: 876]
+    * Where might historical assumptions be vulnerable to current changes? [cite: 877]
     """)
-    
+
     st.markdown('---')
+
+    # Section 6: Restart Option
+    if st.button('Start New Assessment', use_container_width=False): [cite: 975, 976]
+        for key in list(st.session_state.keys()): [cite: 978]
+            del st.session_state[key] [cite: 979]
+        st.rerun() [cite: 980]
     
     # Closing Statement
     st.info("""
