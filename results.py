@@ -445,7 +445,7 @@ def show_results_page():
         'CONDITIONAL': '🟡',
         'MIXED': '⚪',
         'FRAGILE': '🔴'
-    } [cite: 816, 817, 821]
+    } 
 
     for lifeline_name, data in analysis.items():
         icon = status_color.get(data['status'], '⚪')
