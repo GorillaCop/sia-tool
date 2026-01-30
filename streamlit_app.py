@@ -283,6 +283,11 @@ def show_metadata_page():
             "Assessment Date",
             value=st.session_state.get("assessment_date", today_local)
         )
+        
+        assessment_date = st.date_input(
+            "Assessment Date",
+            value=st.session_state.get("assessment_date", today_local)
+        )
     
     st.session_state["org_name"] = org_name
     st.session_state["assessment_date"] = assessment_date
