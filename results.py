@@ -548,20 +548,17 @@ def show_results_page():
     # Export options
     st.markdown('---')
     st.header('Export Options')
-    analysis = st.session_state.get("analysis")
-    if analysis is None:
-    st.error("No analysis found. Please complete the assessment first.")
-    return
-col1, col2 = st.columns(2)
 
-with col1:
-    if st.button("📄 Build Executive Brief", use_container_width=True):
-        with st.spinner("Building your executive brief..."):
+    col1, col2 = st.columns(2)
 
-            fig = create_network_signal_map(analysis)
-            map_png_b64 = fig_to_png_base64(fig)
+    with col1:
+        if st.button("📄 Build Executive Brief", use_container_width=True):
+            with st.spinner("Building your executive brief..."):
 
-            brief_html = build_executive_brief_html(
+                fig = create_network_signal_map(analysis)
+                map_png_b64 = fig_to_png_base64(fig)
+
+                brief_html = build_executive_brief_html(
                 org_name=st.session_state.org_name,
                 assessment_date=str(st.session_state.assessment_date),
                 analysis=analysis,
