@@ -406,19 +406,17 @@ def show_assessment_page():
         if st.button("Save Progress", use_container_width=True):
             st.success("Progress saved!")
 
-    with col3:
+     with col3:
         if lifeline_idx < len(LIFELINES) - 1:
             if st.button("Next Lifeline", use_container_width=True):
-                st.session_state.current_lifeline += 1
-                scroll_to_top() # Added this
-                st.rerun()
-        if st.button("Generate Assessment →", use_container_width=True, type="primary"):
-            from results import build_analysis_from_responses  # or whatever function exists
-            st.session_state["analysis"] = build_analysis_from_responses(st.session_state.responses)
-            st.session_state.page = "results"
+            st.session_state.current_lifeline += 1
             scroll_to_top()
             st.rerun()
-
+        else:
+            if st.button("Generate Assessment →", use_container_width=True, type="primary"):
+                st.session_state.page = "results"
+                scroll_to_top()
+                st.rerun()
 
     render_footer(show_prepared_by=True)
 
