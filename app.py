@@ -319,16 +319,30 @@ def show_metadata_page():
             st.error('Please enter an organization name to continue.')
 
 def scroll_to_top():
-    """Force browser to scroll to top with a delay to override button focus."""
+    """Force browser to scroll to top with multiple strategies."""
     components.html(
         """
         <script>
-            setTimeout(function() {
-                var mainSection = window.parent.document.querySelector('section.main');
-                if (mainSection) {
-                    mainSection.scrollTo({ top: 0, behavior: 'auto' });
+            function scrollToTop() {
+                // Try multiple selectors
+                const selectors = ['section.main', '.main', 'section[data-testid="stAppViewContainer"]'];
+                for (let selector of selectors) {
+                    const element = window.parent.document.querySelector(selector);
+                    if (element) {
+                        element.scrollTop = 0;
+                        element.scrollTo({top: 0, left: 0, behavior: 'instant'});
+                        break;
+                    }
                 }
-            }, 50); 
+                // Also try window scroll
+                window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
+            }
+            
+            // Execute immediately and after a short delay
+            scrollToTop();
+            setTimeout(scrollToTop, 10);
+            setTimeout(scrollToTop, 50);
+            setTimeout(scrollToTop, 100);
         </script>
         """,
         height=0,
