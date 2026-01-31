@@ -572,7 +572,15 @@ For shared organizational clarity, this assessment is often reviewed in a facili
     # Export options
     st.markdown("---")
     st.header("Export Options")
-    st.info("Designed for board circulation. Open in Chrome → Print → Save as PDF.")
+    
+    # Add print-to-PDF button
+    st.markdown("""
+    <div style='background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin-bottom: 1rem;'>
+        <strong>📄 Quick PDF Export:</strong> After downloading the HTML brief below, 
+        open it in your browser → Press <kbd>Ctrl+P</kbd> (or <kbd>⌘+P</kbd> on Mac) 
+        → Select "Save as PDF" → Done!
+    </div>
+    """, unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
