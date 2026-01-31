@@ -1,5 +1,5 @@
 """
-Signal Integrity Assessment™
+House of Cards Assessment™
 Streamlit Application - Main Entry Point
 """
 import streamlit.components.v1 as components
@@ -55,7 +55,7 @@ FOOTER_SUBTEXT = "Prepared by Mike McCracken • 2026"
 APP_VERSION = "2026-01-28b"
 
 st.set_page_config(
-    page_title="Signal Integrity Assessment™",
+    page_title="House of Cards Assessment™",
     page_icon="🎯",
     layout="wide",
     initial_sidebar_state="collapsed"
