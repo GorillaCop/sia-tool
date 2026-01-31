@@ -1,5 +1,5 @@
 """
-Signal Integrity Assessment™
+House of Cards Assessment™
 Results Page with Signal Map Visualization
 """
 
