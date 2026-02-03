@@ -450,7 +450,7 @@ with col3:
             st.rerun()
 
 
-    render_footer(show_prepared_by=True)
+        render_footer(show_prepared_by=True)
 
 def main():
     """Main application router"""
