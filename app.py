@@ -326,21 +326,30 @@ def show_metadata_page():
             st.error('Please enter an organization name to continue.')
 
 def scroll_to_top():
-    """Force browser to scroll to top with aggressive retry strategy."""
+    """Force browser to scroll to top with multiple strategies."""
     components.html(
         """
         <script>
-            function forceScrollTop() {
-                const mainContainer = window.parent.document.querySelector('section.main');
-                if (mainContainer) {
-                    mainContainer.scrollTop = 0;
+            function scrollToTop() {
+                // Try multiple selectors
+                const selectors = ['section.main', '.main', 'section[data-testid="stAppViewContainer"]'];
+                for (let selector of selectors) {
+                    const element = window.parent.document.querySelector(selector);
+                    if (element) {
+                        element.scrollTop = 0;
+                        element.scrollTo({top: 0, left: 0, behavior: 'instant'});
+                        break;
+                    }
                 }
-                window.parent.scrollTo(0, 0);
+                // Also try window scroll
+                window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
             }
-            forceScrollTop();
-            setTimeout(forceScrollTop, 100);
-            setTimeout(forceScrollTop, 300);
-            setTimeout(forceScrollTop, 600);
+            
+            // Execute immediately and after a short delay
+            scrollToTop();
+            setTimeout(scrollToTop, 10);
+            setTimeout(scrollToTop, 50);
+            setTimeout(scrollToTop, 100);
         </script>
         """,
         height=0,
