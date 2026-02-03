@@ -361,7 +361,7 @@ def show_assessment_page():
     # Force scroll to top using anchor
     st.markdown('<div id="top-anchor"></div>', unsafe_allow_html=True)
     
-    lifeline_idx = st.session_state.get("current_lifeline", 0)C
+    lifeline_idx = st.session_state.get("current_lifeline", 0)
     
     # Keep index in range
     if lifeline_idx < 0:
