@@ -425,17 +425,13 @@ def build_executive_brief_html(org_name: str, assessment_date: str, analysis: di
         contact_line=CONTACT_LINE
     )
 def show_results_page():
-       responses = st.session_state.get("responses", {})
+    # Force scroll to top using anchor
+    st.markdown('<div id="top-anchor"></div>', unsafe_allow_html=True)
+    
+    responses = st.session_state.get("responses", {})
     if not responses:
         st.error("No responses found. Please complete the assessment first.")
         return
-
-    # Force scroll to top upon loading results
-    try:
-        scroll_to_top()
-    except Exception:
-        # If JS injection fails in some environments, continue rendering the results page.
-        pass
 
     st.title("Signal Integrity Assessment™")
     st.markdown(
