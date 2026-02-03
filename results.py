@@ -13,14 +13,21 @@ import base64
 from jinja2 import Template
 
 def scroll_to_top():
-    """Injects JavaScript to scroll the main content area to the top."""
+    """Force browser to scroll to top with aggressive retry strategy."""
     components.html(
         """
         <script>
-            var mainSection = window.parent.document.querySelector('section.main');
-            if (mainSection) {
-                mainSection.scrollTo({ top: 0, behavior: 'auto' });
+            function forceScrollTop() {
+                const mainContainer = window.parent.document.querySelector('section.main');
+                if (mainContainer) {
+                    mainContainer.scrollTop = 0;
+                }
+                window.parent.scrollTo(0, 0);
             }
+            forceScrollTop();
+            setTimeout(forceScrollTop, 100);
+            setTimeout(forceScrollTop, 300);
+            setTimeout(forceScrollTop, 600);
         </script>
         """,
         height=0,
