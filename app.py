@@ -357,14 +357,11 @@ def scroll_to_top():
 
 def show_assessment_page():
     """Assessment page - ensure view starts at the top."""
-    # Ensure the browser is scrolled to the top when the assessment page loads
-    try:
-        scroll_to_top()
-    except Exception:
-        # Defensive: if JS injection fails for any reason, continue rendering
-        pass
-
-    lifeline_idx = st.session_state.get("current_lifeline", 0)
+    
+    # Force scroll to top using anchor
+    st.markdown('<div id="top-anchor"></div>', unsafe_allow_html=True)
+    
+    lifeline_idx = st.session_state.get("current_lifeline", 0)C
     
     # Keep index in range
     if lifeline_idx < 0:
