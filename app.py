@@ -326,41 +326,45 @@ def show_metadata_page():
             st.error('Please enter an organization name to continue.')
 
 def scroll_to_top():
-    """Force browser to scroll to top with multiple strategies."""
+    """Force browser to scroll to top — targets all known Streamlit container selectors."""
     components.html(
         """
         <script>
-            function scrollToTop() {
-                // Try multiple selectors
-                const selectors = ['section.main', '.main', 'section[data-testid="stAppViewContainer"]'];
-                for (let selector of selectors) {
-                    const element = window.parent.document.querySelector(selector);
-                    if (element) {
-                        element.scrollTop = 0;
-                        element.scrollTo({top: 0, left: 0, behavior: 'instant'});
-                        break;
+            function scrollUp() {
+                var selectors = [
+                    '[data-testid="stAppViewBlockContainer"]',
+                    '[data-testid="stApp"]',
+                    '[data-testid="stAppViewContainer"]',
+                    '[data-testid="stMainBlockContainer"]',
+                    'section.main',
+                    '.main',
+                    '.block-container'
+                ];
+                selectors.forEach(function(sel) {
+                    var el = window.parent.document.querySelector(sel);
+                    if (el) {
+                        el.scrollTop = 0;
+                        try { el.scrollTo({top: 0, left: 0, behavior: 'instant'}); } catch(e) {}
                     }
-                }
-                // Also try window scroll
-                window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'});
+                });
+                try { window.parent.scrollTo({top: 0, left: 0, behavior: 'instant'}); } catch(e) {}
+                try { window.parent.document.documentElement.scrollTop = 0; } catch(e) {}
+                try { window.parent.document.body.scrollTop = 0; } catch(e) {}
             }
-            
-            // Execute immediately and after a short delay
-            scrollToTop();
-            setTimeout(scrollToTop, 10);
-            setTimeout(scrollToTop, 50);
-            setTimeout(scrollToTop, 100);
+            scrollUp();
+            setTimeout(scrollUp, 50);
+            setTimeout(scrollUp, 150);
+            setTimeout(scrollUp, 300);
+            setTimeout(scrollUp, 600);
         </script>
         """,
         height=0,
     )
 
 def show_assessment_page():
-    """Assessment page - ensure view starts at the top."""
-    
-    # Force scroll to top using anchor
-    st.markdown('<div id="top-anchor"></div>', unsafe_allow_html=True)
-    
+    """Assessment page - scroll fires here after every rerender, not before st.rerun()."""
+    scroll_to_top()
+
     lifeline_idx = st.session_state.get("current_lifeline", 0)
     
     # Keep index in range
@@ -427,7 +431,6 @@ def show_assessment_page():
         if st.session_state.current_lifeline > 0:
             if st.button("← Previous Lifeline", use_container_width=True):
                 st.session_state.current_lifeline -= 1
-                scroll_to_top()
                 st.rerun()
 
     with col2:
@@ -446,7 +449,6 @@ def show_assessment_page():
                 else:
                     st.session_state.current_lifeline += 1
 
-                scroll_to_top()
                 st.rerun()
 
 
