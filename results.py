@@ -557,7 +557,7 @@ For shared organizational clarity, this assessment is often reviewed in a facili
     Gain shared organizational clarity by reviewing this assessment in a facilitated discussion
     with your leadership team.
   </p>
-  <a href='mailto:contact@southwindplanning.com?subject=Mirror Session Request&body=I just completed the Signal Integrity Assessment and would like to schedule a mirror session.%0D%0A%0D%0AOrganization: {org_name}%0D%0AAssessment Date: {date}'
+  <a href='mailto:mike@southwindplanning.com?subject=Mirror Session Request&body=I just completed the Signal Integrity Assessment and would like to schedule a mirror session.%0D%0A%0D%0AOrganization: {org_name}%0D%0AAssessment Date: {date}'
      style='display: inline-block; background-color: #1e293b; color: white; padding: 0.875rem 2rem;
             text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.2s;'>
     Schedule Mirror Session →
